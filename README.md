@@ -1,11 +1,40 @@
-<div align="center">
+# Nexus Portfolio
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A premium, high-performance developer portfolio built with React 19, Vite, and Tailwind CSS 4.
 
-  <h1>Built with AI Studio</h2>
+## Key Features
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- **Technical Glassmorphism Design**: Minimalist, modern aesthetic with deep contrast and vibrant accents.
+- **Advanced Animations**: Powered by Framer Motion (version 12) for smooth layout transitions and micro-interactions.
+- **Project Filtering**: Dynamic project showcase with category-based filtering.
+- **Experience Timeline**: Structured overview of professional growth.
+- **Validated Contact Form**: Real-time validation using React Hook Form and Zod.
+- **Custom Cursor & Smooth Scroll**: Enhanced UX for a boutique feel.
+- **Fully Responsive**: Mobile-first architecture covering all breakpoints.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Architecture & Tech Stack
 
-</div>
+- **Framework**: React 19 + Vite (Optimized for performance)
+- **Styling**: Tailwind CSS 4 (Latest version with modern theme features)
+- **Animations**: motion/react (Framer Motion 12)
+- **Form Handling**: React Hook Form + Zod
+- **Icons**: Lucide React
+- **Typography**: Inter (Sans) & Space Grotesk (Display)
+
+## Project Structure
+
+- `src/components`: UI primitives and layout sections.
+- `src/hooks`: Custom React hooks (if any).
+- `src/lib`: Utility functions (cn merger, etc.).
+- `src/constants`: Centralized configuration and portfolio data.
+- `src/types`: Strict TypeScript definitions.
+
+## Getting Started
+
+1. Install dependencies: `npm install`
+2. Run development server: `npm run dev`
+3. Build for production: `npm run build`
+
+## Design Principles
+
+Follows **SOLID** principles and uses a **Hook/Composition** pattern for its UI components, ensuring maintainability and scalability.

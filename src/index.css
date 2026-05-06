@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-bg-dark: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-text-main: var(--text-main);
+  --color-border-main: var(--border-main);
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+:root {
+  --brand-primary: #3b82f6;
+  --brand-secondary: #34d399;
+  --bg-main: #050505;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --text-main: #E5E5E5;
+  --border-main: rgba(255, 255, 255, 0.1);
+  --gradient-bg: radial-gradient(at 50% -20%, #1e1b4b 0, transparent 60%);
+}
+
+[data-theme='light'] {
+  --bg-main: #ffffff;
+  --bg-card: #f8fafc;
+  --text-main: #0f172a;
+  --border-main: rgba(0, 0, 0, 0.06);
+  --gradient-bg: radial-gradient(at 50% -20%, #eff6ff 0, transparent 80%);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg-dark text-text-main font-sans selection:bg-brand-primary/30 selection:text-brand-primary;
+    background-image: var(--gradient-bg);
+    background-attachment: fixed;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-brand-primary;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    @apply font-display tracking-tighter leading-none;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-md border border-border-main shadow-2xl;
+    background-color: var(--bg-card);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-emerald-500;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
