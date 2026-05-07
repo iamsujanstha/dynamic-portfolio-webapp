@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'motion/react';
-import { MousePointer2, ArrowRight, Github, Twitter, Linkedin } from 'lucide-react';
+import { MousePointer2, ArrowRight, Github, Twitter, Linkedin, FileText, Download } from 'lucide-react';
 import { Button } from '@/src/components/ui/Button';
 
 export const HeroSection = () => {
@@ -64,16 +64,21 @@ export const HeroSection = () => {
             className="flex flex-wrap items-center gap-6"
           >
             <a 
-              href="#projects" 
-              className="px-8 py-4 bg-text-main text-bg-dark font-black uppercase text-[10px] tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-500 rounded-xs shadow-xl shadow-brand-primary/5"
+              href="/resume.pdf" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-8 py-4 bg-text-main text-bg-dark font-black uppercase text-[10px] tracking-widest hover:bg-brand-primary hover:text-white transition-all duration-500 rounded-xs shadow-xl shadow-brand-primary/5"
             >
-              Selected Work
+              <FileText size={14} />
+              View Resume
             </a>
             <a 
               href="/resume.pdf" 
-              className="px-8 py-4 border border-border-main text-text-main font-black uppercase text-[10px] tracking-widest hover:bg-text-main hover:text-bg-dark transition-all duration-500 rounded-xs"
+              download="Sujan_Shrestha_Resume.pdf"
+              className="flex items-center gap-2 px-8 py-4 border border-border-main text-text-main font-black uppercase text-[10px] tracking-widest hover:bg-text-main hover:text-bg-dark transition-all duration-500 rounded-xs"
             >
-              Download CV
+              <Download size={14} />
+              Download Resume
             </a>
             <div className="flex items-center gap-6 md:pl-6 md:border-l border-border-main">
               <a href="https://github.com/iamsujanstha" target="_blank" rel="noopener noreferrer" className="text-text-main/30 hover:text-brand-primary transition-colors"><Github size={18} /></a>
