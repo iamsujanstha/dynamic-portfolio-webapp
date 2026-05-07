@@ -10,6 +10,7 @@ import { SkillsSection as Skills } from './features/skills';
 import { ExperienceSection as Experience } from './features/experience';
 import { ContactSection as Contact } from './features/contact';
 import { CustomCursor } from './components/ui/CustomCursor';
+import { AIAssistant } from './components/AIAssistant';
 import { SEO } from './components/common';
 import { motion, useScroll, useSpring } from 'motion/react';
 
@@ -22,7 +23,7 @@ export default function App() {
   });
 
   return (
-    <div className="relative min-h-screen selection:bg-brand-primary/30 selection:text-brand-primary">
+    <div className="relative min-h-screen selection:bg-brand-primary/30 selection:text-brand-primary transition-colors duration-500">
       <SEO />
       
       {/* Skip to Main Content for Accessibility */}
@@ -51,6 +52,7 @@ export default function App() {
       </main>
 
       <Footer />
+      <AIAssistant />
 
       {/* Decorative Background Glows (Fixed position) */}
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-[120px] pointer-events-none -z-10 opacity-50 dark:opacity-100" />
