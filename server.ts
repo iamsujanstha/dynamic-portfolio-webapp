@@ -3,9 +3,6 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { Resend } from 'resend';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function startServer() {
   const app = express();
@@ -18,6 +15,7 @@ async function startServer() {
     const { name, email, message } = req.body;
     
     const resendApiKey = process.env.RESEND_API_KEY;
+    const contactEmail = process.env.CONTACT_EMAIL || 'sujan.sjv08@gmail.com';
     
     if (!resendApiKey) {
       console.error('RESEND_API_KEY is not set');
@@ -29,7 +27,7 @@ async function startServer() {
     try {
       const { data, error } = await resend.emails.send({
         from: 'Portfolio Contact <onboarding@resend.dev>',
-        to: ['beingsujan.co@gmail.com'],
+        to: [contactEmail],
         subject: `New Message from ${name} via Portfolio`,
         replyTo: email,
         html: `

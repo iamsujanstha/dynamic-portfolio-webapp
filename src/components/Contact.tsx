@@ -124,7 +124,7 @@ export const Contact = () => {
             <div className="space-y-8">
               {[
                 { icon: MapPin, label: 'Location', value: 'Tanahun, Gandaki, Nepal' },
-                { icon: Mail, label: 'Email', value: 'tlsujank.co@gmail.com' },
+                { icon: Mail, label: 'Email', value: 'sujan.sjv08@gmail.com' },
                 { icon: Phone, label: 'Phone', value: '+977 9806545497' },
               ].map((item, index) => (
                 <motion.div 
