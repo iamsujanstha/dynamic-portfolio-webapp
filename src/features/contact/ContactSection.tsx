@@ -8,8 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'motion/react';
 import { Send, MapPin, Mail, Phone, Loader2 } from 'lucide-react';
-import { Button } from './ui/Button';
-import { db, auth } from '../lib/firebase';
+import { Button } from '@/src/components/ui/Button';
+import { db, auth } from '@/src/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const contactSchema = z.object({
@@ -67,7 +67,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
-export const Contact = () => {
+export const ContactSection = () => {
   const {
     register,
     handleSubmit,

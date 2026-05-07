@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { EXPERIENCE, EDUCATION } from '../constants';
-import { Card } from './ui/Card';
+import { EXPERIENCE, EDUCATION } from '@/src/core';
+import { Card } from '@/src/components/ui/Card';
 import { motion } from 'motion/react';
 import { GraduationCap, Briefcase } from 'lucide-react';
 
-export const Experience = () => {
+export const ExperienceSection = () => {
   return (
     <section id="experience" className="py-32 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">

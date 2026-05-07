@@ -5,9 +5,9 @@
 
 import { motion } from 'motion/react';
 import { MousePointer2, ArrowRight, Github, Twitter, Linkedin } from 'lucide-react';
-import { Button } from './ui/Button';
+import { Button } from '@/src/components/ui/Button';
 
-export const Hero = () => {
+export const HeroSection = () => {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-bg-dark">
       {/* Background Texture & Gradients */}

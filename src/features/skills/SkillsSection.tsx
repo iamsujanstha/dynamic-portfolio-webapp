@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SKILLS } from '../constants';
+import { SKILLS } from '@/src/core';
 import { motion } from 'motion/react';
 import * as Icons from 'lucide-react';
 
-export const Skills = () => {
+export const SkillsSection = () => {
   return (
     <section id="skills" className="py-32 px-6 md:px-12 bg-text-main/5">
       <div className="max-w-7xl mx-auto">

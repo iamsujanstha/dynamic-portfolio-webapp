@@ -6,8 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Code2, Sun, Moon } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { useTheme } from '../context/ThemeContext';
+import { cn } from '@/src/lib/utils';
+import { useTheme } from '@/src/providers';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);

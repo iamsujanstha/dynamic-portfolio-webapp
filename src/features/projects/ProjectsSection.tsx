@@ -6,9 +6,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
 import { ExternalLink, Github, Loader2, Minus, ArrowUpRight, Zap } from 'lucide-react';
-import { fetchGitHubProjects } from '../services/githubService';
-import { PROJECTS as STATIC_PROJECTS } from '../constants';
-import { Project } from '../types';
+import { fetchGitHubProjects } from '@/src/services/githubService';
+import { PROJECTS as STATIC_PROJECTS, Project } from '@/src/core';
 
 const CATEGORIES = ['all', 'web', 'mobile', 'ai', 'design'];
 
@@ -19,7 +18,7 @@ const TAG_STYLES = [
   { text: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
 ];
 
-export const Projects = () => {
+export const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [isLoading, setIsLoading] = useState(true);

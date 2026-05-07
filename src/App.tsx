@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { Projects } from './components/Projects';
-import { Skills } from './components/Skills';
-import { Experience } from './components/Experience';
-import { Contact } from './components/Contact';
-import { Footer } from './components/Footer';
+import { Navbar, Footer } from './layouts';
+import { HeroSection as Hero } from './features/hero';
+import { ProjectsSection as Projects } from './features/projects';
+import { SkillsSection as Skills } from './features/skills';
+import { ExperienceSection as Experience } from './features/experience';
+import { ContactSection as Contact } from './features/contact';
 import { CustomCursor } from './components/ui/CustomCursor';
-import { SEO } from './components/SEO';
+import { SEO } from './components/common';
 import { motion, useScroll, useSpring } from 'motion/react';
 
 export default function App() {
