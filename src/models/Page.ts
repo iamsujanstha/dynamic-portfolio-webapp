@@ -26,4 +26,5 @@ const PageSchema = new Schema<IPage>({
   },
 }, { timestamps: true });
 
-export default mongoose.models.Page || mongoose.model<IPage>('Page', PageSchema);
+const Page = mongoose.models.Page || mongoose.model<IPage>('Page', PageSchema);
+export default Page as mongoose.Model<IPage>;

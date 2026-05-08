@@ -29,4 +29,5 @@ const SectionSchema = new Schema<ISection>({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
-export default mongoose.models.Section || mongoose.model<ISection>('Section', SectionSchema);
+const Section = mongoose.models.Section || mongoose.model<ISection>('Section', SectionSchema);
+export default Section as mongoose.Model<ISection>;

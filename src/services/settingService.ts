@@ -8,7 +8,7 @@ export class SettingService {
   static async getGlobalSettings() {
     await dbConnect();
     // Return the first setting document found or create default
-    let settings = await Settings.findOne({}).exec();
+    let settings = await (Settings as any).findOne({}).exec();
     if (!settings) {
       settings = await Settings.create({});
     }

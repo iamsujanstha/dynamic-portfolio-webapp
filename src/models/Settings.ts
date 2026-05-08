@@ -26,4 +26,5 @@ const SettingsSchema = new Schema<ISettings>({
   maintenanceMode: { type: Boolean, default: false },
 }, { timestamps: true });
 
-export default mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);
+const Settings = mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);
+export default Settings as mongoose.Model<ISettings>;

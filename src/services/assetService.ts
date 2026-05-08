@@ -15,12 +15,12 @@ export class AssetService {
   static async getAllAssets(type?: string) {
     await dbConnect();
     const query = type ? { type } : {};
-    return Asset.find(query).sort({ createdAt: -1 }).exec();
+    return (Asset as any).find(query).sort({ createdAt: -1 }).exec();
   }
 
   static async deleteAsset(id: string) {
     await dbConnect();
     // Logic to actually remove the file from S3 should be added here
-    return Asset.findByIdAndDelete(id).exec();
+    return (Asset as any).findByIdAndDelete(id).exec();
   }
 }

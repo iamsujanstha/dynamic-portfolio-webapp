@@ -25,7 +25,7 @@ export class PageService {
 
   static async getAllPages() {
     await dbConnect();
-    return Page.find({}).select('title slug').exec();
+    return Page.find<IPage>({}).select('title slug').exec();
   }
 
   static async createPage(data: Partial<IPage>) {

@@ -4,12 +4,12 @@ import Project, { IProject } from '../models/Project';
 export class ProjectService {
   static async getAllProjects() {
     await dbConnect();
-    return Project.find({}).sort({ createdAt: -1 }).exec();
+    return Project.find<IProject>({}).sort({ createdAt: -1 }).exec();
   }
 
   static async getFeaturedProjects() {
     await dbConnect();
-    return Project.find({ featured: true }).sort({ order: 1 }).exec();
+    return Project.find<IProject>({ featured: true }).sort({ order: 1 }).exec();
   }
 
   static async getProjectBySlug(slug: string) {
@@ -24,11 +24,11 @@ export class ProjectService {
 
   static async updateProject(id: string, data: Partial<IProject>) {
     await dbConnect();
-    return Project.findByIdAndUpdate(id, data, { new: true }).exec();
+    return (Project as any).findByIdAndUpdate(id, data, { new: true }).exec();
   }
 
   static async deleteProject(id: string) {
     await dbConnect();
-    return Project.findByIdAndDelete(id).exec();
+    return (Project as any).findByIdAndDelete(id).exec();
   }
 }

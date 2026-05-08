@@ -8,7 +8,7 @@ export class NavigationService {
    */
   static async getNavByKey(key: string) {
     await dbConnect();
-    return Navigation.findOne({ key })
+    return (Navigation as any).findOne({ key })
       .lean()
       .exec();
   }

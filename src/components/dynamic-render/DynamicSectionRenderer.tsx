@@ -51,7 +51,7 @@ export const DynamicSectionRenderer = ({ sections }: { sections: ISection[] }) =
       {sections.map((section) => {
         const Component = SectionComponents[section.type];
         if (!Component) return null;
-        return <Component key={section._id as string} data={section} />;
+        return <Component key={section._id?.toString() || Math.random().toString()} data={section} />;
       })}
     </>
   );

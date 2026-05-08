@@ -25,4 +25,5 @@ const NavigationSchema = new Schema<INavigation>({
   items: [NavItemSchema],
 }, { timestamps: true });
 
-export default mongoose.models.Navigation || mongoose.model<INavigation>('Navigation', NavigationSchema);
+const Navigation = mongoose.models.Navigation || mongoose.model<INavigation>('Navigation', NavigationSchema);
+export default Navigation as mongoose.Model<INavigation>;
