@@ -21,17 +21,17 @@ export async function seedDatabase() {
   const heroSection = await Section.create({
     type: SectionType.HERO,
     status: 'published',
-    title: 'Staff Software Engineer at Google',
-    subtitle: 'Building scalable systems and crafting delightful digital experiences.',
+    title: 'Senior Frontend Engineer',
+    subtitle: 'Architecture-focused developer crafting high-performance digital experiences where Precision meets Performance.',
     order: 0,
   });
 
   const skillsSection = await Section.create({
     type: SectionType.SKILLS_CLOUD,
     status: 'published',
-    title: 'Core Expertise',
+    title: 'Expertise',
     content: {
-      skills: ['TypeScript', 'Next.js', 'MongoDB', 'Cloud Infrastructure', 'System Design'],
+      skills: ['JavaScript / TypeScript', 'React / Next.js', 'Node.js / NestJS', 'Tailwind CSS', 'GraphQL', 'Docker / CI/CD', 'Jest', 'Redux Saga', 'NX Monorepo', 'WCAG Accessibility'],
     },
     order: 1,
   });
@@ -50,18 +50,18 @@ export async function seedDatabase() {
     status: 'published',
     sections: [heroSection._id, skillsSection._id, projectSection._id],
     metadata: {
-      title: 'Portfolio | Sujan Shrestha',
-      description: 'Senior Staff Engineer Portfolio',
+      title: 'Sujan Shrestha | Senior Frontend Engineer',
+      description: 'Portfolio of Sujan Shrestha - Senior Frontend Engineer specializing in React, TypeScript, and high-performance web applications.',
     },
   });
 
   // 4. Create a Sample Project
   await Project.create({
-    title: 'Dynamic Portfolio Platform',
-    slug: 'portfolio-platform',
-    description: 'A production-grade headless CMS built with Next.js and MongoDB.',
-    thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
-    tags: ['Next.js', 'Mongoose', 'Tailwind'],
+    title: 'AI ARCHITECT',
+    slug: 'ai-architect',
+    description: 'An advanced AI-powered architectural visualization tool that generates optimized floor plans and photorealistic renders from simple text descriptions.',
+    thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1632&auto=format&fit=crop',
+    tags: ['AI', 'Next.js', 'Stable Diffusion', 'Three.js'],
     featured: true,
   });
 

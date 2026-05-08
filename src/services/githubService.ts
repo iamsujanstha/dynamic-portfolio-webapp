@@ -12,7 +12,7 @@ export async function fetchGitHubProjects(): Promise<Project[]> {
     const response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=6`, {
       headers: {
         // Only add token if it starts with VITE_ to be exposed to client
-        ...(import.meta.env.VITE_GITHUB_TOKEN ? { Authorization: `token ${import.meta.env.VITE_GITHUB_TOKEN}` } : {}),
+        ...(process.env.VITE_GITHUB_TOKEN ? { Authorization: `token ${process.env.VITE_GITHUB_TOKEN}` } : {}),
       },
     });
 

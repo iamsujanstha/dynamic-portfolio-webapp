@@ -16,9 +16,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check local storage or system preference
-    const stored = localStorage.getItem('theme') as Theme;
-    if (stored) return stored;
+    // Check local storage or system preference if in browser
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme') as Theme;
+      if (stored) return stored;
+    }
     return 'dark'; // Default to dark as per Elegant Dark theme
   });
 

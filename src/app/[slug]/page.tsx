@@ -32,10 +32,15 @@ export default async function DynamicPage({ params }: PageProps) {
 
 // Staff Engineer implementation: Generate static parameters for SEO and speed
 export async function generateStaticParams() {
-  const pages = await PageService.getAllPages();
-  return pages.map((page) => ({
-    slug: page.slug,
-  }));
+  try {
+    const pages = await PageService.getAllPages();
+    return pages.map((page) => ({
+      slug: page.slug,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch pages for static generation:', error);
+    return [];
+  }
 }
 
 // Revalidate every hour (ISR)

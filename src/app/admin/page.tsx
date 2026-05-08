@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { PageService } from '@/services/pageService';
 import { ProjectService } from '@/services/projectService';
 import { AssetService } from '@/services/assetService';
