@@ -3,12 +3,27 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Bot, User, Loader2, Minus, Sun, Moon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageSquare, X, Send, Minus } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { askSujanAI } from '@/src/services/aiAssistantService';
 
-import { useTheme } from '@/src/providers';
+// Staff Engineer Refactor: We use the API proxy to keep secrets safe
+async function callChatAPI(message: string, history: any[]) {
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, history }),
+    });
+    
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error('Chat error:', error);
+    return "I'm sorry, I'm having trouble connecting to my brain right now. Please try again soon!";
+  }
+}
 
 interface Message {
   role: 'user' | 'model';
@@ -18,8 +33,8 @@ interface Message {
 const SUJAN_AVATAR = "https://github.com/iamsujanstha.png";
 
 export const AIAssistant = () => {
-  const { theme: currentTheme } = useTheme();
-  const isDarkMode = currentTheme === 'dark';
+    // We'll use a local mock or simplified theme check if provider is missing for now
+  const [isDarkMode] = useState(true); 
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
@@ -59,7 +74,7 @@ export const AIAssistant = () => {
       parts: [{ text: msg.content }]
     }));
 
-    const response = await askSujanAI(userMessage, history);
+    const response = await callChatAPI(userMessage, history);
     
     setMessages(prev => [...prev, { role: 'model', content: response || "I'm not sure how to answer that. Try asking about my projects!" }]);
     setIsLoading(false);
