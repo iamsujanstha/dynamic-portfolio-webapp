@@ -20,8 +20,27 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // 1. Check for Bootstrap Admin (from .env)
+        // This allows initial login before the DB is seeded
+        const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+        const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
+        const envAdminPass = process.env.ADMIN_PASSWORD || 'password123';
+
+        if (
+          (credentials.email === envAdminEmail || credentials.email === envAdminUser) && 
+          credentials.password === envAdminPass
+        ) {
+          return {
+            id: 'admin-bootstrap',
+            name: 'System Admin',
+            email: envAdminEmail,
+            role: UserRole.ADMIN
+          };
+        }
+
         await dbConnect();
 
+        // 2. Database Lookup
         // Find user by email and explicitly select password
         const user = await User.findOne({ email: credentials.email }).select('+password');
 

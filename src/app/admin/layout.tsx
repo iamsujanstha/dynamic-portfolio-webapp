@@ -10,16 +10,26 @@ import {
   Settings,
   Image as ImageIcon,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Menu,
+  X
 } from 'lucide-react';
 import { SignOutButton } from '@/src/components/admin/SignOutButton';
 import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const { data: session } = useSession();
   const isViewer = (session?.user as any)?.role === 'VIEWER';
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
@@ -30,17 +40,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="flex h-screen bg-[#0A0A0A] text-zinc-100 font-sans">
+    <div className="flex h-screen bg-[#0A0A0A] text-zinc-100 font-sans overflow-hidden">
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-zinc-900/50 backdrop-blur-md border-b border-zinc-800 z-50 px-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <ShieldCheck size={18} className="text-white" />
+          </div>
+          <span className="font-bold text-sm tracking-tight">Staff Console</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+        >
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Backdrop for Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r border-zinc-800 flex flex-col">
-        <div className="p-6 border-b border-zinc-800 flex items-center gap-3">
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 w-64 border-r border-zinc-800 bg-[#0A0A0A] flex flex-col z-50 transition-transform duration-300 lg:translate-x-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="p-6 border-b border-zinc-800 hidden lg:flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)]">
             <ShieldCheck size={20} className="text-white" />
           </div>
           <span className="font-bold text-lg tracking-tight">Staff Console</span>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto lg:pt-4 pt-20">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -68,8 +105,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A]">
-        <div className="p-10 max-w-7xl mx-auto">
+      <main className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A] pt-16 lg:pt-0">
+        <div className="p-6 lg:p-10 max-w-7xl mx-auto">
           {children}
         </div>
       </main>

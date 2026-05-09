@@ -138,24 +138,24 @@ function CmsHeader({ title, description }: { title: string; description: string 
   }
 
   return (
-    <div className="mb-8 flex items-start justify-between gap-6">
+    <div className="mb-8 flex flex-col md:flex-row items-start justify-between gap-6">
       <div>
         <h1 className="text-3xl font-black tracking-tight text-white">{title}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p>
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         {isActive && (
           <>
             <button
               onClick={handleReset}
-              className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-amber-500 hover:bg-amber-500/10 transition-all"
+              className="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-700 hover:text-white transition-all"
             >
               Reset Simulation
             </button>
             <Link
               href="/"
               target="_blank"
-              className="rounded-lg border border-blue-500/30 bg-blue-500/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-blue-500 hover:bg-blue-500/10 transition-all flex items-center gap-2"
+              className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"
             >
               View Changes <ExternalLink size={12} />
             </Link>
@@ -371,21 +371,21 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
+    <div className="flex flex-col gap-6 lg:gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tighter">Content Management</h1>
+          <h1 className="text-2xl lg:text-3xl font-black tracking-tighter">Content Management</h1>
           <p className="text-sm text-zinc-500">Manage your website sections and pages</p>
         </div>
         {isViewer && (
-          <div className="flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20 w-fit">
             Viewer Mode (Read Only)
           </div>
         )}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-        <div className="space-y-2">
+      <div className="grid gap-6 lg:gap-8 lg:grid-cols-[280px_1fr]">
+        <div className="space-y-2 order-2 lg:order-1">
           <button
             onClick={() => choosePage('new')}
             className="flex w-full items-center gap-2 rounded-xl border border-dashed border-zinc-800 p-4 text-xs font-bold text-zinc-500 hover:border-blue-500 hover:bg-blue-500/5 hover:text-blue-400 transition-all"
@@ -393,21 +393,23 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
             <Plus size={16} /> Create New Page
           </button>
           <div className="h-px bg-zinc-800 my-4" />
-          {pages.map((page: any) => (
-            <button
-              key={page._id}
-              onClick={() => choosePage(page._id)}
-              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition-all ${selectedId === page._id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'
-                }`}
-            >
-              <span className="truncate">{page.title}</span>
-              <span className="text-[10px] opacity-50 font-black uppercase">{page.slug}</span>
-            </button>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+            {pages.map((page: any) => (
+              <button
+                key={page._id}
+                onClick={() => choosePage(page._id)}
+                className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition-all ${selectedId === page._id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'
+                  }`}
+              >
+                <span className="truncate">{page.title}</span>
+                <span className="text-[10px] opacity-50 font-black uppercase ml-2">{page.slug}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <form onSubmit={save} className="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-md">
-          <div className="grid gap-6 md:grid-cols-2">
+        <form onSubmit={save} className="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md order-1 lg:order-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <Field label="Page Title">
               <input className={inputClass} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Home Page" />
             </Field>
@@ -418,7 +420,7 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
           <Field label="JSON Content (Sections)">
             <div className="relative group">
               <textarea
-                className={`${inputClass} min-h-[500px] font-mono text-xs leading-relaxed text-blue-300/80 selection:bg-blue-500/30`}
+                className={`${inputClass} min-h-[400px] lg:min-h-[500px] font-mono text-xs leading-relaxed text-blue-300/80 selection:bg-blue-500/30`}
                 value={sections}
                 onChange={(event) => setSections(event.target.value)}
                 spellCheck={false}
@@ -426,23 +428,33 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
               <button
                 type="button"
                 onClick={prettify}
-                className="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-zinc-700 transition-all opacity-0 group-hover:opacity-100"
+                className="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-zinc-700 transition-all opacity-0 lg:group-hover:opacity-100 hidden lg:block"
               >
                 Prettify JSON
               </button>
             </div>
+            {/* Mobile Prettify Button */}
+            <button
+              type="button"
+              onClick={prettify}
+              className="lg:hidden mt-2 w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-zinc-700"
+            >
+              Prettify JSON
+            </button>
           </Field>
-          <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
-            <div className="flex gap-3">
-              <button type="submit" disabled={isPending} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-zinc-800 gap-4">
+            <div className="flex flex-wrap gap-3">
+              <button type="submit" disabled={isPending} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all">
                 <Save size={16} /> {isViewer ? 'Simulate Save' : 'Save Page'}
               </button>
               {selectedId !== 'new' && (
-                <button type="button" onClick={() => removePage()} disabled={isPending} className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50">
+                <button type="button" onClick={() => removePage()} disabled={isPending} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 transition-all">
                   <Trash2 size={16} /> {isViewer ? 'Simulate Delete' : 'Delete'}
                 </button>
               )}</div>
-            <StatusDisplay />
+            <div className="w-full sm:w-auto overflow-hidden">
+              <StatusDisplay />
+            </div>
           </div>
         </form>
       </div>
@@ -573,43 +585,49 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
     <>
       <CmsHeader title="Projects CMS" description="Manage portfolio project cards, tags, links, thumbnails, and featured status from MongoDB." />
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
-          <button onClick={() => chooseProject('new')} className="mb-3 flex w-full items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500">
+        <aside className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 order-2 lg:order-1">
+          <button onClick={() => chooseProject('new')} className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500 transition-all">
             <Plus size={16} /> New Project
           </button>
-          {projects.map((project) => (
-            <button key={project._id} onClick={() => chooseProject(project._id)} className={`mb-2 w-full rounded-lg px-4 py-3 text-left text-sm ${selectedId === project._id ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:bg-zinc-950'}`}>
-              {project.title}
-            </button>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+            {projects.map((project) => (
+              <button 
+                key={project._id} 
+                onClick={() => chooseProject(project._id)} 
+                className={`w-full rounded-lg px-4 py-3 text-left text-sm font-bold transition-all ${selectedId === project._id ? 'bg-zinc-800 text-white border border-zinc-700 shadow-xl shadow-black/40' : 'text-zinc-400 hover:bg-zinc-950'}`}
+              >
+                {project.title}
+              </button>
+            ))}
+          </div>
         </aside>
-        <form onSubmit={save} className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={save} className="space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md order-1 lg:order-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <Field label="Title"><input className={inputClass} value={form.title} onChange={(event) => update('title', event.target.value)} /></Field>
             <Field label="Slug"><input className={inputClass} value={form.slug} onChange={(event) => update('slug', event.target.value)} /></Field>
           </div>
           <Field label="Description"><textarea className={`${inputClass} min-h-28`} value={form.description} onChange={(event) => update('description', event.target.value)} /></Field>
           <Field label="Thumbnail URL"><input className={inputClass} value={form.thumbnail} onChange={(event) => update('thumbnail', event.target.value)} /></Field>
           <Field label="Tags"><input className={inputClass} value={form.tags} onChange={(event) => update('tags', event.target.value)} placeholder="Next.js, MongoDB, Tailwind" /></Field>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <Field label="GitHub URL"><input className={inputClass} value={form.github} onChange={(event) => update('github', event.target.value)} /></Field>
             <Field label="Live URL"><input className={inputClass} value={form.live} onChange={(event) => update('live', event.target.value)} /></Field>
           </div>
-          <label className="flex items-center gap-3 text-sm text-zinc-300">
-            <input type="checkbox" checked={form.featured} onChange={(event) => update('featured', event.target.checked)} />
-            Featured project
+          <label className="flex items-center gap-3 text-sm text-zinc-300 bg-zinc-950/40 p-3 rounded-xl border border-zinc-800/50 w-fit cursor-pointer hover:bg-zinc-950 transition-colors">
+            <input type="checkbox" className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-blue-600 focus:ring-blue-500/20" checked={form.featured} onChange={(event) => update('featured', event.target.checked)} />
+            <span className="font-medium">Featured project</span>
           </label>
-          <div className="flex items-center gap-4 pt-2">
-            <button disabled={isPending} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50">
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-zinc-800">
+            <button disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all shadow-lg shadow-blue-500/20">
               <Save size={16} /> {isViewer ? 'Simulate Save' : 'Save Project'}
             </button>
             {selectedId !== 'new' && (
-              <button type="button" onClick={removeProject} disabled={isPending} className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50">
+              <button type="button" onClick={removeProject} disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 px-6 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 transition-all">
                 <Trash2 size={16} /> {isViewer ? 'Simulate Delete' : 'Delete'}
               </button>
             )}
+            <StatusDisplay />
           </div>
-          <StatusDisplay />
         </form>
       </div>
     </>
@@ -668,22 +686,22 @@ function AssetsCms({ initialAssets, onUpdate }: { initialAssets: any[], onUpdate
   return (
     <>
       <CmsHeader title="Assets / PDFs" description="Upload resume PDFs or image assets. Uploaded files are stored under `/public/uploads` and tracked in MongoDB." />
-      <form onSubmit={isViewer ? simulateUpload : upload} className="mb-8 grid gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 md:grid-cols-[1fr_1fr_auto] md:items-end">
+      <form onSubmit={isViewer ? simulateUpload : upload} className="mb-8 grid gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md md:grid-cols-[1fr_1fr_auto] md:items-end">
         <Field label="Display Name"><input name="name" className={inputClass} placeholder="Resume 2026" /></Field>
-        <Field label="PDF or Image File"><input name="file" required type="file" accept="application/pdf,image/*" className={inputClass} /></Field>
-        <button disabled={isPending} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all">
-          <FileUp size={16} /> {isViewer ? 'Simulate Upload' : 'Upload'}
+        <Field label="PDF or Image File"><input name="file" required type="file" accept="application/pdf,image/*" className={`${inputClass} pt-2.5`} /></Field>
+        <button disabled={isPending} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white hover:bg-blue-500 disabled:opacity-50 transition-all shadow-xl shadow-blue-500/20 active:scale-95">
+          <FileUp size={16} /> {isViewer ? 'Simulate' : 'Upload'}
         </button>
       </form>
       <StatusDisplay />
-      <div className="mt-6 overflow-hidden rounded-xl border border-zinc-800">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/20">
         {assets.map((asset) => (
-          <div key={asset._id} className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 bg-zinc-900/60 px-5 py-4 last:border-b-0">
-            <div>
-              <p className="font-semibold text-white">{asset.name}</p>
-              <a href={asset.url} target="_blank" className="text-sm text-blue-400 hover:text-blue-300">{asset.url}</a>
+          <div key={asset._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 bg-zinc-900/60 px-5 py-5 last:border-b-0 group hover:bg-zinc-900/80 transition-colors">
+            <div className="min-w-0">
+              <p className="font-bold text-white tracking-tight">{asset.name}</p>
+              <a href={asset.url} target="_blank" className="text-xs text-blue-400 hover:text-blue-300 truncate block mt-1 transition-colors">{asset.url}</a>
             </div>
-            <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs font-bold text-zinc-400">{asset.type}</span>
+            <span className="w-fit rounded-full border border-zinc-700/50 bg-zinc-800/50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-zinc-200 transition-colors">{asset.type}</span>
           </div>
         ))}
       </div>
@@ -840,21 +858,21 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
+    <div className="flex flex-col gap-6 lg:gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tighter">System Settings</h1>
+          <h1 className="text-2xl lg:text-3xl font-black tracking-tighter">System Settings</h1>
           <p className="text-sm text-zinc-500">Global configurations for your portfolio</p>
         </div>
         {isViewer && (
-          <div className="flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20 w-fit">
             Viewer Mode (Read Only)
           </div>
         )}
       </div>
 
-      <form onSubmit={save} className="grid gap-8 lg:grid-cols-2">
-        <div className="space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-md">
+      <form onSubmit={save} className="grid gap-6 lg:gap-8 lg:grid-cols-2">
+        <div className="space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md">
           <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
               <User size={16} />
@@ -866,7 +884,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             <input className={inputClass} value={form.siteName} onChange={(event) => update('siteName', event.target.value)} placeholder="My Portfolio" />
           </Field>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <Field label="First Name">
               <input className={inputClass} value={form.firstName} onChange={(event) => update('firstName', event.target.value)} placeholder="Sujan" />
             </Field>
@@ -884,10 +902,10 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             />
           </Field>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             <Field label="Primary Color">
               <div className="flex gap-2">
-                <input type="color" className="h-11 w-11 shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 p-1" value={form.primaryColor} onChange={(event) => update('primaryColor', event.target.value)} />
+                <input type="color" className="h-11 w-11 shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 p-1 cursor-pointer" value={form.primaryColor} onChange={(event) => update('primaryColor', event.target.value)} />
                 <input className={inputClass} value={form.primaryColor} onChange={(event) => update('primaryColor', event.target.value)} />
               </div>
             </Field>
@@ -908,7 +926,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             <Field label="Contact Email">
               <input className={inputClass} value={form.contactEmail} onChange={(event) => update('contactEmail', event.target.value)} placeholder="hello@example.com" />
             </Field>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
               <Field label="Phone Number">
                 <input className={inputClass} value={form.contactNumber} onChange={(event) => update('contactNumber', event.target.value)} placeholder="9802323233" />
               </Field>
@@ -922,7 +940,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
               <h2 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Social Connect</h2>
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
               <Field label="GitHub URL">
                 <input className={inputClass} value={form.github} onChange={(event) => update('github', event.target.value)} placeholder="https://github.com/..." />
               </Field>
@@ -933,7 +951,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
           </div>
         </div>
 
-        <div className="space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-md">
+        <div className="space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md h-fit">
           <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
               <FileUp size={16} />
@@ -941,60 +959,58 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             <h2 className="text-sm font-black uppercase tracking-widest">Brand Assets</h2>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-2">
-            <div className="space-y-4">
-              <Field label="Profile Picture">
-                <div className="relative aspect-square overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
-                  {form.profilePicture ? (
-                    <img src={form.profilePicture} alt="Profile" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-zinc-700">
-                      <User size={48} />
-                    </div>
-                  )}
-                  <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/60 opacity-0 transition-opacity hover:opacity-100">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Change Photo</span>
-                    <input type="file" className="hidden" accept="image/*" onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = () => setImgSrc(reader.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }} />
-                  </label>
-                </div>
-              </Field>
-            </div>
+          <div className="grid gap-8">
+            <Field label="Profile Picture">
+              <div className="relative aspect-square max-w-[240px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 mx-auto sm:mx-0">
+                {form.profilePicture ? (
+                  <img src={form.profilePicture} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-zinc-700">
+                    <User size={48} />
+                  </div>
+                )}
+                <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/60 opacity-0 transition-opacity hover:opacity-100">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white">Change Photo</span>
+                  <input type="file" className="hidden" accept="image/*" onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => setImgSrc(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
+                </label>
+              </div>
+            </Field>
 
-            <div className="space-y-6">
-              <Field label="Current Resume">
-                <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-zinc-500">
-                      <FileUp size={20} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-xs font-bold text-zinc-300">
-                        {form.resumeUrl ? form.resumeUrl.split('/').pop() : 'No resume uploaded'}
-                      </p>
-                      <label className="mt-1 cursor-pointer text-[10px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400">
-                        Upload New PDF
-                        <input type="file" className="hidden" accept="application/pdf" onChange={handleResumeUpload} />
-                      </label>
-                    </div>
+            <Field label="Current Resume">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-zinc-500">
+                    <FileUp size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-zinc-300">
+                      {form.resumeUrl ? form.resumeUrl.split('/').pop() : 'No resume uploaded'}
+                    </p>
+                    <label className="mt-1 cursor-pointer text-[10px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400">
+                      Upload New PDF
+                      <input type="file" className="hidden" accept="application/pdf" onChange={handleResumeUpload} />
+                    </label>
                   </div>
                 </div>
-              </Field>
-            </div>
+              </div>
+            </Field>
           </div>
         </div>
 
-        <div className="lg:col-span-2 flex items-center justify-between border-t border-zinc-800 pt-6">
-          <button disabled={isPending} className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-50 transition-all shadow-2xl active:scale-95">
-            <CheckCircle2 size={16} /> {isViewer ? 'Simulate Save Settings' : 'Save All Settings'}
+        <div className="lg:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between border-t border-zinc-800 pt-6 gap-6">
+          <button disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-50 transition-all shadow-2xl active:scale-95">
+            <CheckCircle2 size={16} /> {isViewer ? 'Simulate Save' : 'Save All Settings'}
           </button>
-          <StatusDisplay />
+          <div className="w-full sm:w-auto overflow-hidden">
+            <StatusDisplay />
+          </div>
         </div>
       </form>
 
