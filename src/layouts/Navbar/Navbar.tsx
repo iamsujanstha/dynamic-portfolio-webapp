@@ -5,15 +5,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Code2, Sun, Moon } from 'lucide-react';
+import { Menu, X, Code2, Sun, Moon, LogIn, Terminal, ShieldCheck } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useTheme } from '@/src/providers';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const { theme, toggleTheme } = useTheme();
+  const { data: session } = useSession();
+  const isViewer = (session?.user as any)?.role === 'VIEWER';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -141,13 +145,29 @@ export const Navbar = () => {
            >
              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
            </button>
-           <a 
-             href="#contact" 
-             onClick={(e) => handleNavClick(e, '#contact')}
-             className="px-6 py-3 bg-text-main text-bg-dark text-[10px] font-black rounded-full hover:bg-brand-primary hover:text-white transition-all shadow-xl shadow-bg-dark/10 uppercase tracking-widest"
+           <Link 
+             href="/admin" 
+             className={cn(
+               "flex items-center gap-2 px-6 py-2.5 text-[10px] font-black rounded-full transition-all uppercase tracking-widest border",
+               session 
+                 ? isViewer 
+                   ? "border-amber-500/50 bg-amber-500/5 text-amber-500 shadow-lg shadow-amber-500/10" 
+                   : "border-brand-primary/50 bg-brand-primary/5 text-brand-primary shadow-lg shadow-brand-primary/10"
+                 : "border-border-main text-text-main/60 hover:border-text-main hover:text-text-main"
+             )}
            >
-             Contact
-           </a>
+             {session ? (
+               <>
+                 <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isViewer ? "bg-amber-500" : "bg-brand-primary")} />
+                 {isViewer ? 'Viewer Hub' : 'Admin Hub'}
+               </>
+             ) : (
+               <>
+                 <Terminal size={14} />
+                 Console Access
+               </>
+             )}
+           </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -201,6 +221,20 @@ export const Navbar = () => {
                 </a>
               );
             })}
+            <Link 
+              href="/admin" 
+              className={cn(
+                "mt-4 flex items-center gap-3 px-10 py-4 rounded-2xl text-lg font-bold border transition-all",
+                session 
+                  ? isViewer 
+                    ? "border-amber-500/30 bg-amber-500/5 text-amber-500" 
+                    : "border-brand-primary/30 bg-brand-primary/5 text-brand-primary"
+                  : "border-border-main text-text-main hover:border-brand-primary"
+              )}
+            >
+              <Terminal size={20} />
+              {session ? (isViewer ? 'Viewer Hub' : 'Admin Hub') : 'Console Access'}
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

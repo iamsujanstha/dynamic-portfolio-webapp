@@ -4,14 +4,14 @@ import { NextResponse } from 'next/server';
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
-    const isAdmin = String(token?.role || '').toLowerCase() === 'admin';
+    const role = String(token?.role || '').toLowerCase();
+    const isAuthorized = role === 'admin' || role === 'viewer';
 
-    // Authenticated user trying to access /admin but not an ADMIN → redirect
-    if (req.nextUrl.pathname.startsWith('/admin') && !isAdmin) {
+    // Allow both Admin and Viewer to access CMS, but block others
+    if (req.nextUrl.pathname.startsWith('/admin') && !isAuthorized) {
       return NextResponse.redirect(new URL('/unauthorized', req.url));
     }
 
-    // Allow the request through
     return NextResponse.next();
   },
   {

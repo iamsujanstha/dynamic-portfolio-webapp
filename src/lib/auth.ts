@@ -1,27 +1,42 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import dbConnect from '@/src/lib/db/mongodb';
+import User from '@/src/models/User';
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
     CredentialsProvider({
       name: 'Admin Login',
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "admin" },
+        email: { label: "Email", type: "email", placeholder: "admin@example.com" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (
-          credentials?.username === process.env.ADMIN_USERNAME &&
-          credentials?.password === process.env.ADMIN_PASSWORD
-        ) {
-          // Return an admin user object
+        if (!credentials?.email || !credentials?.password) return null;
+
+        await dbConnect();
+
+        // Find user by email and explicitly select password
+        const user = await User.findOne({ email: credentials.email }).select('+password');
+
+        if (!user) return null;
+
+        const isMatch = await bcrypt.compare(credentials.password, user.password || '');
+        if (isMatch) {
           return {
-            id: 'admin',
-            name: 'Administrator',
-            email: process.env.CONTACT_EMAIL || 'admin@portfolio.com',
-            role: 'admin'
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role
           };
         }
+
         return null;
       }
     })
@@ -30,9 +45,35 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'google') {
+        await dbConnect();
+
+        // Check if user exists
+        let dbUser = await User.findOne({ email: user.email });
+
+        // If not, create them with VIEWER role
+        if (!dbUser) {
+          dbUser = await User.create({
+            name: user.name || profile?.name || 'Google User',
+            email: user.email,
+            image: user.image,
+            role: 'VIEWER'
+          });
+        }
+
+        // Attach role to the user object that gets passed to jwt callback
+        (user as any).role = dbUser.role;
+        user.id = dbUser._id.toString();
+
+        return true;
+      }
+      return true; // allow credentials sign in
+    },
     async jwt({ token, user }) {
+      // User is only passed on the initial sign in
       if (user) {
-        token.role = (user as any).role;
+        token.role = (user as any).role || 'VIEWER';
         token.id = user.id;
       }
       return token;

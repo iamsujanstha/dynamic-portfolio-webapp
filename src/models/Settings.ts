@@ -15,6 +15,7 @@ export interface ISettings extends Document {
   location?: string;
   gaTrackingId?: string;
   maintenanceMode: boolean;
+  primaryColor?: string;
 }
 
 const SettingsSchema = new Schema<ISettings>({
@@ -32,6 +33,7 @@ const SettingsSchema = new Schema<ISettings>({
   location: String,
   gaTrackingId: String,
   maintenanceMode: { type: Boolean, default: false },
+  primaryColor: { type: String, default: '#2563eb' },
 }, { timestamps: true });
 
 const Settings = mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);

@@ -13,7 +13,7 @@ export class PageService {
   static async getPageBySlug(slug: string, includeDrafts: boolean = false): Promise<IPage | null> {
     await dbConnect();
     
-    const query: any = { slug };
+    const query: any = { slug, isDeleted: { $ne: true } };
     if (!includeDrafts) {
       query.status = 'published';
     }
@@ -29,7 +29,7 @@ export class PageService {
 
   static async getAllPages() {
     await dbConnect();
-    return Page.find<IPage>({})
+    return Page.find<IPage>({ isDeleted: { $ne: true } })
       .select('title slug status description metadata sections createdAt updatedAt')
       .populate({ path: 'sections', options: { sort: { order: 1 } } })
       .sort({ updatedAt: -1 })
@@ -68,12 +68,7 @@ export class PageService {
 
   static async deletePage(id: string) {
     await dbConnect();
-    const page = await Page.findById(id).exec();
-
-    if (page?.sections?.length) {
-      await Section.deleteMany({ _id: { $in: page.sections } });
-    }
-
-    return Page.findByIdAndDelete(id).exec();
+    // Soft delete the page
+    return Page.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
   }
 }

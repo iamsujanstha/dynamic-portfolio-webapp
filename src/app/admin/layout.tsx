@@ -1,22 +1,31 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  FolderKanban, 
-  Settings, 
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  FileText,
+  FolderKanban,
+  Settings,
   Image as ImageIcon,
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
-import { SignOutButton } from '@/components/admin/SignOutButton';
+import { SignOutButton } from '@/src/components/admin/SignOutButton';
+import { useSession } from 'next-auth/react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  const { data: session } = useSession();
+  const isViewer = (session?.user as any)?.role === 'VIEWER';
+
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { name: 'Pages', icon: FileText, href: '/admin/pages' },
     { name: 'Projects', icon: FolderKanban, href: '/admin/projects' },
-    { name: 'Assets', icon: ImageIcon, href: '/admin/assets' },
+    ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets' }]),
     { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
@@ -32,19 +41,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex items-center justify-between group px-4 py-3 rounded-xl hover:bg-zinc-900 transition-all text-zinc-400 hover:text-white"
-            >
-              <div className="flex items-center gap-3">
-                <item.icon size={18} className="group-hover:text-blue-500 transition-colors" />
-                <span className="text-sm font-medium">{item.name}</span>
-              </div>
-              <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-            </Link>
-          ))}
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center justify-between group px-4 py-3 rounded-xl transition-all ${isActive
+                    ? 'bg-blue-600/10 text-blue-500'
+                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon size={18} className={`transition-colors ${isActive ? 'text-blue-500' : 'group-hover:text-blue-500'}`} />
+                  <span className={`text-sm font-medium ${isActive ? 'text-blue-500' : ''}`}>{item.name}</span>
+                </div>
+                <ChevronRight size={14} className={`transition-all ${isActive ? 'opacity-100 translate-x-0 text-blue-500' : 'opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0'}`} />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="p-4 border-t border-zinc-800">

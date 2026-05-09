@@ -11,6 +11,7 @@ export interface IPage extends Document {
     description: string;
     ogImage?: string;
   };
+  isDeleted: boolean;
 }
 
 const PageSchema = new Schema<IPage>({
@@ -24,6 +25,7 @@ const PageSchema = new Schema<IPage>({
     description: String,
     ogImage: String,
   },
+  isDeleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
 const Page = mongoose.models.Page || mongoose.model<IPage>('Page', PageSchema);
