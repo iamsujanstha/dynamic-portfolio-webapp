@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/src/lib/db/mongodb';
-import User from '@/src/models/User';
+import User, { UserRole } from '@/src/models/User';
 import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name || profile?.name || 'Google User',
             email: user.email,
             image: user.image,
-            role: 'VIEWER'
+            role: UserRole.VIEWER
           });
         }
 
@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       // User is only passed on the initial sign in
       if (user) {
-        token.role = (user as any).role || 'VIEWER';
+        token.role = (user as any).role || UserRole.VIEWER;
         token.id = user.id;
       }
       return token;

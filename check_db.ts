@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { Page } from './src/models/Page';
-import { Section } from './src/models/Section';
+import Page from './src/models/Page';
+import Section from './src/models/Section';
 
 async function check() {
   await mongoose.connect(process.env.MONGODB_URI as string);
