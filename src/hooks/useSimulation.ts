@@ -14,12 +14,16 @@ import { simulationService, SimKey } from '../services/simulationService';
  */
 export function useSimulation() {
   const [isActive, setIsActive] = useState(false);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    setIsActive(simulationService.isActive());
-    return simulationService.subscribe(() => {
+    const update = () => {
       setIsActive(simulationService.isActive());
-    });
+      setVersion(v => v + 1);
+    };
+    
+    update();
+    return simulationService.subscribe(update);
   }, []);
 
   const getSimData = useCallback(<T>(key: SimKey): T | null => {
@@ -36,6 +40,7 @@ export function useSimulation() {
 
   return {
     isActive,
+    version,
     getSimData,
     saveSimData,
     resetSimulation

@@ -22,7 +22,7 @@ import { SimKey } from './services/simulationService';
 
 export default function App({ cmsData }: { cmsData?: CMSData }) {
   const [effectiveData, setEffectiveData] = useState<CMSData | undefined>(cmsData);
-  const { getSimData } = useSimulation();
+  const { getSimData, version } = useSimulation();
 
   useEffect(() => {
     const applyOverrides = () => {
@@ -61,7 +61,7 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
 
     applyOverrides();
     // The useSimulation hook handles the subscription to storage events internally
-  }, [cmsData, getSimData]);
+  }, [cmsData, getSimData, version]);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -92,7 +92,16 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Hero cmsData={effectiveData?.hero} resumeUrl={effectiveData?.settings?.resumeUrl} profilePicture={effectiveData?.settings?.profilePicture} />
+        <Hero 
+          cmsData={effectiveData?.hero} 
+          resumeUrl={effectiveData?.settings?.resumeUrl} 
+          profilePicture={effectiveData?.settings?.profilePicture}
+          firstName={effectiveData?.settings?.firstName}
+          lastName={effectiveData?.settings?.lastName}
+          profileDescription={effectiveData?.settings?.profileDescription}
+          githubUrl={effectiveData?.settings?.github}
+          linkedinUrl={effectiveData?.settings?.linkedin}
+        />
         <Projects cmsData={effectiveData?.projects} />
         <Skills cmsData={effectiveData?.skills} />
         <Experience cmsData={effectiveData?.experience} />
@@ -105,7 +114,13 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
         />
       </main>
 
-      <Footer />
+      <Footer 
+        firstName={effectiveData?.settings?.firstName}
+        lastName={effectiveData?.settings?.lastName}
+        githubUrl={effectiveData?.settings?.github}
+        linkedinUrl={effectiveData?.settings?.linkedin}
+        email={effectiveData?.settings?.contactEmail}
+      />
       <AIAssistant />
 
       {/* Decorative Background Glows (Fixed position) */}

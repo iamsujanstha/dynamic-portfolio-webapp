@@ -6,7 +6,21 @@
 import { Code2, Github, Twitter, Linkedin, Heart, ExternalLink, ArrowUpRight, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export const Footer = () => {
+export const Footer = ({
+  firstName = 'SUJAN',
+  lastName = 'SHRESTHA',
+  githubUrl = 'https://github.com/iamsujanstha',
+  linkedinUrl = 'https://linkedin.com/in/tlsujank',
+  twitterUrl = '#',
+  email = 'tlsujank.co@gmail.com'
+}: {
+  firstName?: string;
+  lastName?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  email?: string;
+}) => {
   const currentYear = new Date().getFullYear();
 
   const handleScrollToTop = () => {
@@ -22,16 +36,16 @@ export const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: 'GitHub', icon: <Github size={18} />, href: 'https://github.com/iamsujanstha' },
-    { name: 'LinkedIn', icon: <Linkedin size={18} />, href: 'https://linkedin.com/in/tlsujank' },
-    { name: 'Twitter', icon: <Twitter size={18} />, href: '#' },
+    { name: 'GitHub', icon: <Github size={18} />, href: githubUrl },
+    { name: 'LinkedIn', icon: <Linkedin size={18} />, href: linkedinUrl },
+    { name: 'Twitter', icon: <Twitter size={18} />, href: twitterUrl },
   ];
 
   return (
     <footer className="relative pt-32 pb-12 px-6 md:px-12 border-t border-border-main bg-linear-to-b from-transparent to-bg-dark/40 overflow-hidden">
       {/* Background Decorative Element */}
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      
+
       <div className="max-w-7xl mx-auto">
         {/* Top Section: Branding & Links */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 pb-20 border-b border-border-main">
@@ -41,9 +55,9 @@ export const Footer = () => {
               <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center text-brand-primary border border-brand-primary/20">
                 <Code2 size={20} />
               </div>
-              <span className="text-xl font-display font-medium tracking-tight text-text-main">Sujan.</span>
+              <span className="text-xl font-display font-medium tracking-tight text-text-main">{firstName}.</span>
             </div>
-            
+
             <p className="text-lg md:text-xl font-display font-light text-text-main/60 leading-relaxed italic max-w-md">
               "Focused on building high-performance, <span className="text-text-main font-semibold">scalable applications</span> where logic meets clean architecture and intuitive user experiences."
             </p>
@@ -59,8 +73,8 @@ export const Footer = () => {
               <h4 className="text-[10px] font-mono text-text-main/30 uppercase tracking-[0.4em]">Directory</h4>
               <nav className="flex flex-col gap-4">
                 {navLinks.map((link) => (
-                  <a 
-                    key={link.name} 
+                  <a
+                    key={link.name}
                     href={link.href}
                     className="text-sm text-text-main/60 hover:text-brand-primary transition-colors font-light flex items-center gap-2 group"
                   >
@@ -75,8 +89,8 @@ export const Footer = () => {
               <h4 className="text-[10px] font-mono text-text-main/30 uppercase tracking-[0.4em]">Connect</h4>
               <nav className="flex flex-col gap-4">
                 {socialLinks.map((social) => (
-                  <a 
-                    key={social.name} 
+                  <a
+                    key={social.name}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -86,8 +100,8 @@ export const Footer = () => {
                     {social.name}
                   </a>
                 ))}
-                <a 
-                  href="mailto:sujan.sjv08@gmail.com" 
+                <a
+                  href={`mailto:${email}`}
                   className="text-sm text-text-main/60 hover:text-brand-primary transition-colors font-light flex items-center gap-3 group"
                 >
                   <span className="opacity-40 group-hover:opacity-100 transition-opacity"><Mail size={18} /></span>
@@ -101,14 +115,14 @@ export const Footer = () => {
         {/* Bottom Section: Legal & Credits */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6 text-text-main/20 text-[9px] uppercase tracking-[0.3em]">
-            <p>&copy; {currentYear} SUJAN SHRESTHA. BUILT FOR EXCELLENCE.</p>
+            <p>&copy; {currentYear} {firstName} {lastName}. BUILT FOR EXCELLENCE.</p>
           </div>
 
           <div className="flex items-center gap-8">
             <p className="flex items-center gap-2 text-text-main/20 text-[9px] uppercase tracking-[0.3em]">
-              Crafted with <Heart size={10} className="text-brand-secondary fill-brand-secondary/20" /> by Sujan
+              Crafted with <Heart size={10} className="text-brand-secondary fill-brand-secondary/20" /> by {firstName}
             </p>
-            <button 
+            <button
               onClick={handleScrollToTop}
               className="p-3 border border-border-main rounded-full text-text-main/30 hover:text-brand-primary hover:border-brand-primary transition-all group shadow-sm bg-bg-card/30"
               aria-label="Back to top"

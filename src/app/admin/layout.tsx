@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Pages', icon: FileText, href: '/admin/pages' },
     { name: 'Projects', icon: FolderKanban, href: '/admin/projects' },
     ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets' }]),
-    { name: 'Settings', icon: Settings, href: '/admin/settings' },
+    { name: 'Profile Settings', icon: Settings, href: '/admin/settings' },
   ];
 
   return (
@@ -48,8 +48,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.name}
                 href={item.href}
                 className={`flex items-center justify-between group px-4 py-3 rounded-xl transition-all ${isActive
-                    ? 'bg-blue-600/10 text-blue-500'
-                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                  ? 'bg-blue-600/10 text-blue-500'
+                  : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
                   }`}
               >
                 <div className="flex items-center gap-3">

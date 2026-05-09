@@ -152,8 +152,8 @@ function CmsHeader({ title, description }: { title: string; description: string 
             >
               Reset Simulation
             </button>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               target="_blank"
               className="rounded-lg border border-blue-500/30 bg-blue-500/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-blue-500 hover:bg-blue-500/10 transition-all flex items-center gap-2"
             >
@@ -695,6 +695,9 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
   const [form, setForm] = useState(initialSettings || {
     siteName: '',
     siteLogo: '',
+    firstName: '',
+    lastName: '',
+    profileDescription: '',
     profilePicture: '',
     resumeUrl: '',
     contactEmail: '',
@@ -737,7 +740,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
 
   async function handleCropUpload() {
     if (!completedCrop || !imgRef.current) return;
-    
+
     if (isViewer) {
       try {
         const blob = await getCroppedImg(imgRef.current!, completedCrop);
@@ -774,7 +777,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
   function handleResumeUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
- 
+
     if (isViewer) {
       update('resumeUrl', URL.createObjectURL(file));
       setMessage('Simulation Mode: Resume updated locally for this session.');
@@ -811,6 +814,9 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
           body: JSON.stringify({
             siteName: form.siteName,
             siteLogo: form.siteLogo,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            profileDescription: form.profileDescription,
             profilePicture: form.profilePicture,
             resumeUrl: form.resumeUrl,
             contactEmail: form.contactEmail,
@@ -857,7 +863,25 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
           </div>
 
           <Field label="Site Name">
-            <input className={inputClass} value={form.siteName} onChange={(event) => update('siteName', event.target.value)} />
+            <input className={inputClass} value={form.siteName} onChange={(event) => update('siteName', event.target.value)} placeholder="My Portfolio" />
+          </Field>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <Field label="First Name">
+              <input className={inputClass} value={form.firstName} onChange={(event) => update('firstName', event.target.value)} placeholder="Sujan" />
+            </Field>
+            <Field label="Last Name">
+              <input className={inputClass} value={form.lastName} onChange={(event) => update('lastName', event.target.value)} placeholder="Shrestha" />
+            </Field>
+          </div>
+
+          <Field label="Professional Bio / Profile Description">
+            <textarea
+              className={`${inputClass} min-h-[100px] resize-none py-3`}
+              value={form.profileDescription}
+              onChange={(event) => update('profileDescription', event.target.value)}
+              placeholder="Architecture-focused developer crafting high-performance digital experiences..."
+            />
           </Field>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -886,10 +910,24 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             </Field>
             <div className="grid gap-6 md:grid-cols-2">
               <Field label="Phone Number">
-                <input className={inputClass} value={form.contactNumber} onChange={(event) => update('contactNumber', event.target.value)} placeholder="+1 234 567 890" />
+                <input className={inputClass} value={form.contactNumber} onChange={(event) => update('contactNumber', event.target.value)} placeholder="9802323233" />
               </Field>
               <Field label="Location">
-                <input className={inputClass} value={form.location} onChange={(event) => update('location', event.target.value)} placeholder="San Francisco, CA" />
+                <input className={inputClass} value={form.location} onChange={(event) => update('location', event.target.value)} placeholder="Kathmandu, Nepal" />
+              </Field>
+            </div>
+          </div>
+
+          <div className="space-y-6 pt-4">
+            <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Social Connect</h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <Field label="GitHub URL">
+                <input className={inputClass} value={form.github} onChange={(event) => update('github', event.target.value)} placeholder="https://github.com/..." />
+              </Field>
+              <Field label="LinkedIn URL">
+                <input className={inputClass} value={form.linkedin} onChange={(event) => update('linkedin', event.target.value)} placeholder="https://linkedin.com/in/..." />
               </Field>
             </div>
           </div>

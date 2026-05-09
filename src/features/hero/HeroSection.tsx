@@ -7,7 +7,25 @@ import { motion } from 'motion/react';
 import { FileText, Download, Github, Linkedin, MessageSquare } from 'lucide-react';
 import { CMSData } from '@/src/app/page';
 
-export const HeroSection = ({ cmsData, resumeUrl, profilePicture }: { cmsData?: CMSData['hero']; resumeUrl?: string; profilePicture?: string }) => {
+export const HeroSection = ({ 
+  cmsData, 
+  resumeUrl, 
+  profilePicture,
+  firstName = 'SUJAN',
+  lastName = 'SHRESTHA',
+  profileDescription,
+  githubUrl = 'https://github.com/iamsujanstha',
+  linkedinUrl = 'https://linkedin.com/in/tlsujank'
+}: { 
+  cmsData?: CMSData['hero']; 
+  resumeUrl?: string; 
+  profilePicture?: string;
+  firstName?: string;
+  lastName?: string;
+  profileDescription?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+}) => {
   const defaultResumeUrl = resumeUrl || '/resume.pdf';
   const displayImage = profilePicture || 'https://github.com/iamsujanstha.png';
 
@@ -37,9 +55,9 @@ export const HeroSection = ({ cmsData, resumeUrl, profilePicture }: { cmsData?: 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="text-[12vw] lg:text-[8vw] font-display font-black leading-[0.8] tracking-tighter text-text-main mb-10 flex flex-col">
+            <h1 className="text-[12vw] lg:text-[8vw] font-display font-black leading-[0.8] tracking-tighter text-text-main mb-10 flex flex-col uppercase">
               <span className="flex items-center gap-4">
-                SUJAN
+                {firstName}
                 <motion.span
                   initial={{ width: 0 }}
                   animate={{ width: 'auto' }}
@@ -47,7 +65,7 @@ export const HeroSection = ({ cmsData, resumeUrl, profilePicture }: { cmsData?: 
                   className="hidden md:block h-[0.1em] bg-text-main/10 w-24"
                 />
               </span>
-              <span className="text-transparent" style={{ WebkitTextStroke: '1px var(--text-main)' }}>SHRESTHA</span>
+              <span className="text-transparent" style={{ WebkitTextStroke: '1px var(--text-main)' }}>{lastName}</span>
             </h1>
           </motion.div>
 
@@ -57,8 +75,8 @@ export const HeroSection = ({ cmsData, resumeUrl, profilePicture }: { cmsData?: 
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-text-main/40 text-lg md:text-xl max-w-lg mb-12 font-light leading-[1.6] italic serif"
           >
-            {cmsData?.subtitle ? (
-              <span dangerouslySetInnerHTML={{ __html: cmsData.subtitle }} />
+            {profileDescription || cmsData?.subtitle ? (
+              <span dangerouslySetInnerHTML={{ __html: profileDescription || cmsData?.subtitle || '' }} />
             ) : (
               <>
                 Architecture-focused developer crafting high-performance digital experiences where <span className="text-text-main">Precision meets Performance.</span>
@@ -90,8 +108,8 @@ export const HeroSection = ({ cmsData, resumeUrl, profilePicture }: { cmsData?: 
               Download Resume
             </a>
             <div className="flex items-center gap-6 md:pl-6 md:border-l border-border-main">
-              <a href="https://github.com/iamsujanstha" target="_blank" rel="noopener noreferrer" className="text-text-main/30 hover:text-brand-primary transition-colors"><Github size={18} /></a>
-              <a href="https://linkedin.com/in/tlsujank" target="_blank" rel="noopener noreferrer" className="text-text-main/30 hover:text-brand-primary transition-colors"><Linkedin size={18} /></a>
+              <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-text-main/30 hover:text-brand-primary transition-colors"><Github size={18} /></a>
+              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-text-main/30 hover:text-brand-primary transition-colors"><Linkedin size={18} /></a>
             </div>
           </motion.div>
         </div>
