@@ -5,7 +5,35 @@
 
 import { SKILLS } from '@/src/core';
 import { motion } from 'motion/react';
-import * as Icons from 'lucide-react';
+import { 
+  Code2, 
+  Atom, 
+  Server, 
+  Wind, 
+  Database, 
+  Package, 
+  CheckCircle2, 
+  Zap, 
+  LayoutTemplate, 
+  Accessibility, 
+  Terminal,
+  Circle
+} from 'lucide-react';
+
+const IconMap: Record<string, any> = {
+  Code2,
+  Atom,
+  Server,
+  Wind,
+  Database,
+  Package,
+  CheckCircle2,
+  Zap,
+  LayoutTemplate,
+  Accessibility,
+  Terminal,
+  Circle
+};
 
 import { CMSData } from '@/src/app/page';
 
@@ -47,7 +75,7 @@ export const SkillsSection = ({ cmsData }: { cmsData?: CMSData['skills'] }) => {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {displaySkills.map((skill: any, index: number) => {
-            const IconComponent = (Icons as any)[skill.icon] || Icons.Circle;
+            const IconComponent = IconMap[skill.icon] || IconMap.Circle;
             return (
               <motion.div
                 key={skill.name}

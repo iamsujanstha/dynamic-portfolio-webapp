@@ -2,7 +2,7 @@ import nextDynamic from 'next/dynamic';
 import { PageService } from '@/services/pageService';
 import { ProjectService } from '@/services/projectService';
 
-const App = nextDynamic(() => import('../App'), { ssr: false });
+const App = nextDynamic(() => import('../App'), { ssr: true });
 
 export const dynamic = 'force-dynamic';
 

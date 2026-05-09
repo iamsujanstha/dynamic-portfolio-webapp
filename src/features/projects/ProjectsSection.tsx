@@ -9,6 +9,7 @@ import { ExternalLink, Github, Loader2, Minus, ArrowUpRight, Zap } from 'lucide-
 import { fetchGitHubProjects } from '@/src/services/githubService';
 import { PROJECTS as STATIC_PROJECTS, Project } from '@/src/core';
 import { CMSData } from '@/src/app/page';
+import Image from 'next/image';
 
 const CATEGORIES = ['all', 'web', 'mobile', 'ai', 'design'];
 
@@ -210,10 +211,12 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
           </div>
 
           <div className="relative w-full h-40 md:h-48 mb-8 rounded-2xl overflow-hidden bg-bg-dark/40 border border-border-main/50">
-            <img
+            <Image
               src={project.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'}
               alt={project.title}
-              className="w-full h-full object-cover opacity-40 group-hover/card:scale-105 group-hover/card:opacity-80 transition-all duration-1000 ease-out grayscale group-hover/card:grayscale-0"
+              fill
+              className="object-cover opacity-40 group-hover/card:scale-105 group-hover/card:opacity-80 transition-all duration-1000 ease-out grayscale group-hover/card:grayscale-0"
+              sizes="(max-width: 768px) 320px, 450px"
             />
             <div className="absolute inset-0 bg-linear-to-t from-bg-card to-transparent/60 opacity-60" />
 

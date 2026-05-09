@@ -6,6 +6,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Minus } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import Image from 'next/image';
 
 // Staff Engineer Refactor: We use the API proxy to keep secrets safe
 async function callChatAPI(message: string, history: any[]) {
@@ -122,12 +123,14 @@ export const AIAssistant = () => {
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className={`w-12 h-12 rounded-full bg-brand-primary overflow-hidden border-2 ${isDarkMode ? 'border-white/10' : 'border-white shadow-sm'}`}
+                    className={`relative w-12 h-12 rounded-full bg-brand-primary overflow-hidden border-2 ${isDarkMode ? 'border-white/10' : 'border-white shadow-sm'}`}
                   >
-                    <img 
+                    <Image 
                       src={SUJAN_AVATAR} 
                       alt="Sujan" 
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="48px"
                     />
                   </motion.div>
                   <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-[#0A0A0A] rounded-full"></span>
@@ -184,8 +187,14 @@ export const AIAssistant = () => {
                       >
                         <div className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                           {msg.role === 'model' && (
-                            <div className={`flex-shrink-0 w-9 h-9 rounded-full border ${theme.border} overflow-hidden mt-1 bg-brand-primary/10 shadow-md`}>
-                              <img src={SUJAN_AVATAR} alt="S" className="w-full h-full object-cover" />
+                            <div className={`relative flex-shrink-0 w-9 h-9 rounded-full border ${theme.border} overflow-hidden mt-1 bg-brand-primary/10 shadow-md`}>
+                              <Image 
+                                src={SUJAN_AVATAR} 
+                                alt="S" 
+                                fill 
+                                className="object-cover" 
+                                sizes="36px"
+                              />
                             </div>
                           )}
                           <div className={`p-4.5 rounded-[1.8rem] text-[14px] leading-relaxed shadow-sm prose ${theme.prose} max-w-none transition-all duration-300 ${

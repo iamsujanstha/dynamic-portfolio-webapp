@@ -12,9 +12,11 @@ import { ProjectsSection as Projects } from './features/projects';
 import { SkillsSection as Skills } from './features/skills';
 import { ExperienceSection as Experience } from './features/experience';
 import { ContactSection as Contact } from './features/contact';
-import { CustomCursor } from './components/ui/CustomCursor';
-import { AIAssistant } from './components/AIAssistant';
-import { SEO } from './components/common';
+import dynamic from 'next/dynamic';
+
+const AIAssistant = dynamic(() => import('./components/AIAssistant').then(m => m.AIAssistant), { ssr: false });
+const CustomCursor = dynamic(() => import('./components/ui/CustomCursor').then(m => m.CustomCursor), { ssr: false });
+
 import { motion, useScroll, useSpring } from 'motion/react';
 import { CMSData } from './app/page';
 import { useSimulation } from './hooks/useSimulation';
@@ -72,8 +74,6 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
 
   return (
     <div className="relative min-h-screen selection:bg-brand-primary/30 selection:text-brand-primary transition-colors duration-500">
-      <SEO />
-
       {/* Skip to Main Content for Accessibility */}
       <a
         href="#main-content"

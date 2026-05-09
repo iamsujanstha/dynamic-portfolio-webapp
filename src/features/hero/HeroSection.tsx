@@ -6,6 +6,7 @@
 import { motion } from 'motion/react';
 import { FileText, Download, Github, Linkedin, MessageSquare } from 'lucide-react';
 import { CMSData } from '@/src/app/page';
+import Image from 'next/image';
 
 export const HeroSection = ({ 
   cmsData, 
@@ -117,28 +118,32 @@ export const HeroSection = ({
         {/* Right Side: Creative Visual */}
         <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: [0, -20, 0],
-              rotate: [0, 2, -2, 0]
-            }}
-            transition={{
-              opacity: { duration: 1.2 },
-              scale: { duration: 1.2 },
-              y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" }
-            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className="relative"
           >
+            <motion.div
+              animate={{
+                y: [0, -20, 0],
+                rotate: [0, 2, -2, 0]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="relative"
+            >
             {/* The "Logo" Image Container */}
             <div className="relative w-[280px] md:w-[420px] aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-border-main shadow-2xl bg-bg-card group/img">
-              <motion.img
+              <Image
                 src={displayImage}
                 alt="Sujan Shrestha"
-                className="w-full h-full object-cover grayscale-50 group-hover/img:grayscale-0 group-hover/img:scale-110 transition-all duration-1000"
-                whileHover={{ scale: 1.05 }}
+                fill
+                priority
+                className="object-cover grayscale-50 group-hover/img:grayscale-0 group-hover/img:scale-110 transition-all duration-1000"
+                sizes="(max-width: 768px) 280px, 420px"
               />
 
               {/* Aesthetic internal frame */}
@@ -173,7 +178,8 @@ export const HeroSection = ({
                   </div>
                 </div>
               </div>
-            </motion.div>
+              </motion.div>
+          </motion.div>
           </motion.div>
 
           {/* Decorative Geometric Shapes */}

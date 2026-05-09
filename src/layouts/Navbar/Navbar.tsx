@@ -10,6 +10,7 @@ import { cn } from '@/src/lib/utils';
 import { useTheme } from '@/src/providers';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -98,11 +99,13 @@ export const Navbar = () => {
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <div className="relative">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-border-main transition-transform duration-500 group-hover:scale-110">
-              <img 
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-border-main transition-transform duration-500 group-hover:scale-110 relative">
+              <Image 
                 src="https://github.com/iamsujanstha.png" 
                 alt="Sujan" 
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
+                fill
+                className="object-cover grayscale group-hover:grayscale-0 transition-all"
+                sizes="40px"
               />
             </div>
             <div className="absolute -inset-1 border border-brand-primary/30 rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { SectionType, ISection } from '@/models/Section';
+import Image from 'next/image';
 
 // Lazy load or import components
 const HeroSection = ({ data }: { data: any }) => (
@@ -17,7 +18,15 @@ const ProjectsSection = ({ data }: { data: any }) => (
         {(data.content?.projects || []).map((project: any) => (
           <article key={project.slug || project.title} className="rounded-xl border border-zinc-800 bg-black/40 p-6">
             {project.thumbnail && (
-              <img src={project.thumbnail} alt="" className="mb-5 aspect-video w-full rounded-lg object-cover" />
+              <div className="relative mb-5 aspect-video w-full overflow-hidden rounded-lg">
+                <Image 
+                  src={project.thumbnail} 
+                  alt={project.title} 
+                  fill 
+                  className="object-cover" 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
             )}
             <h3 className="text-xl font-bold">{project.title}</h3>
             <p className="mt-3 text-sm leading-6 text-zinc-400">{project.description}</p>

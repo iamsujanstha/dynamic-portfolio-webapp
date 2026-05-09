@@ -9,6 +9,7 @@ import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-cr
 import 'react-image-crop/dist/ReactCrop.css';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { sectionTemplate } from '@/core/constants';
 
 type CmsMode = 'pages' | 'projects' | 'assets' | 'settings';
@@ -916,7 +917,13 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             <Field label="Profile Picture">
               <div className="relative aspect-square max-w-[240px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 mx-auto sm:mx-0">
                 {form.profilePicture ? (
-                  <img src={form.profilePicture} alt="Profile" className="h-full w-full object-cover" />
+                  <Image 
+                    src={form.profilePicture} 
+                    alt="Profile" 
+                    fill 
+                    className="object-cover"
+                    sizes="240px"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-zinc-700">
                     <User size={48} />
