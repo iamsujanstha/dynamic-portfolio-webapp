@@ -121,3 +121,50 @@ export const EXPERIENCE: Experience[] = [
     ]
   }
 ];
+
+export const sectionTemplate = [
+  {
+    type: 'HERO',
+    status: 'published',
+    title: 'Senior Frontend Engineer',
+    subtitle: 'Building fast, accessible web experiences.',
+    order: 0,
+    isActive: true,
+    content: {},
+  },
+  {
+    type: 'SKILLS_CLOUD',
+    status: 'published',
+    title: 'Tech Stack',
+    order: 1,
+    isActive: true,
+    content: {
+      skills: ['Next.js', 'TypeScript', 'MongoDB', 'Tailwind CSS'],
+    },
+  },
+  {
+    type: 'EXPERIENCE_TIMELINE',
+    status: 'published',
+    title: 'Experience',
+    order: 2,
+    isActive: true,
+    content: {
+      experiences: [
+        {
+          role: 'Frontend Engineer',
+          company: 'Company Name',
+          period: '2024 - Present',
+          description: ['Built accessible, high-performance web interfaces.'],
+        },
+      ],
+      education: [
+        {
+          id: 1,
+          degree: 'Bachelor of Science in Computer Science',
+          institution: 'University of Technology',
+          period: '2016 - 2020',
+        },
+      ],
+    },
+  },
+];

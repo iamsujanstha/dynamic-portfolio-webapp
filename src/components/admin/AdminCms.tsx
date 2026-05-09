@@ -2,13 +2,14 @@
 
 import { FormEvent, useEffect, useMemo, useState, useTransition, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { simulationService, SimKey } from '@/services/simulationService';
+import { SimKey } from '@/services/simulationService';
 import { useSimulation } from '@/hooks/useSimulation';
 import { CheckCircle2, FileUp, Plus, Save, Trash2, User, X, ExternalLink } from 'lucide-react';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { sectionTemplate } from '@/core/constants';
 
 type CmsMode = 'pages' | 'projects' | 'assets' | 'settings';
 
@@ -16,53 +17,6 @@ type Props = {
   mode: CmsMode;
   initialData: any;
 };
-
-const sectionTemplate = [
-  {
-    type: 'HERO',
-    status: 'published',
-    title: 'Senior Frontend Engineer',
-    subtitle: 'Building fast, accessible web experiences.',
-    order: 0,
-    isActive: true,
-    content: {},
-  },
-  {
-    type: 'SKILLS_CLOUD',
-    status: 'published',
-    title: 'Tech Stack',
-    order: 1,
-    isActive: true,
-    content: {
-      skills: ['Next.js', 'TypeScript', 'MongoDB', 'Tailwind CSS'],
-    },
-  },
-  {
-    type: 'EXPERIENCE_TIMELINE',
-    status: 'published',
-    title: 'Experience',
-    order: 2,
-    isActive: true,
-    content: {
-      experiences: [
-        {
-          role: 'Frontend Engineer',
-          company: 'Company Name',
-          period: '2024 - Present',
-          description: ['Built accessible, high-performance web interfaces.'],
-        },
-      ],
-      education: [
-        {
-          id: 1,
-          degree: 'Bachelor of Science in Computer Science',
-          institution: 'University of Technology',
-          period: '2016 - 2020',
-        },
-      ],
-    },
-  },
-];
 
 function stringifyJson(value: unknown) {
   return JSON.stringify(value, null, 2);
@@ -127,8 +81,10 @@ export function AdminCms({ mode, initialData }: Props) {
   return <SettingsCms initialSettings={currentData} onUpdate={handleUpdate} />;
 }
 
-function CmsHeader({ title, description }: { title: string; description: string }) {
+function CmsHeader({ title, description, previewPath = '/' }: { title: string; description: string; previewPath?: string }) {
   const { isActive, resetSimulation } = useSimulation();
+  const { data: session } = useSession();
+  const isViewer = session?.user?.role === 'viewer';
 
   function handleReset() {
     if (confirm('Are you sure you want to reset all simulated changes? This will restore data from the production database.')) {
@@ -140,27 +96,32 @@ function CmsHeader({ title, description }: { title: string; description: string 
   return (
     <div className="mb-8 flex flex-col md:flex-row items-start justify-between gap-6">
       <div>
-        <h1 className="text-3xl font-black tracking-tight text-white">{title}</h1>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-3xl font-black tracking-tight text-white">{title}</h1>
+          {isViewer && (
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20">
+              Viewer Mode (Read Only)
+            </div>
+          )}
+        </div>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{description}</p>
       </div>
       <div className="flex flex-wrap gap-3">
         {isActive && (
-          <>
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-700 hover:text-white transition-all"
-            >
-              Reset Simulation
-            </button>
-            <Link
-              href="/"
-              target="_blank"
-              className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"
-            >
-              View Changes <ExternalLink size={12} />
-            </Link>
-          </>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-700 hover:text-white transition-all"
+          >
+            Reset Simulation
+          </button>
         )}
+        <Link
+          href={previewPath === 'index' ? '/' : previewPath.startsWith('/') ? previewPath : `/${previewPath}`}
+          target="_blank"
+          className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"
+        >
+          View Changes <ExternalLink size={12} />
+        </Link>
         <Link href="/admin" className="rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-900 transition-all">
           Dashboard
         </Link>
@@ -372,17 +333,11 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-6 gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tighter">Content Management</h1>
-          <p className="text-sm text-zinc-500">Manage your website sections and pages</p>
-        </div>
-        {isViewer && (
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20 w-fit">
-            Viewer Mode (Read Only)
-          </div>
-        )}
-      </div>
+      <CmsHeader
+        title="Content Management"
+        description="Manage your website sections and pages"
+        previewPath={selected?.slug || '/'}
+      />
 
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-[280px_1fr]">
         <div className="space-y-2 order-2 lg:order-1">
@@ -583,7 +538,11 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
 
   return (
     <>
-      <CmsHeader title="Projects CMS" description="Manage portfolio project cards, tags, links, thumbnails, and featured status from MongoDB." />
+      <CmsHeader
+        title="Projects CMS"
+        description="Manage portfolio project cards, tags, links, thumbnails, and featured status from MongoDB."
+        previewPath="/"
+      />
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 order-2 lg:order-1">
           <button onClick={() => chooseProject('new')} className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500 transition-all">
@@ -591,9 +550,9 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
           </button>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
             {projects.map((project) => (
-              <button 
-                key={project._id} 
-                onClick={() => chooseProject(project._id)} 
+              <button
+                key={project._id}
+                onClick={() => chooseProject(project._id)}
                 className={`w-full rounded-lg px-4 py-3 text-left text-sm font-bold transition-all ${selectedId === project._id ? 'bg-zinc-800 text-white border border-zinc-700 shadow-xl shadow-black/40' : 'text-zinc-400 hover:bg-zinc-950'}`}
               >
                 {project.title}
@@ -859,17 +818,11 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-6 gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tighter">System Settings</h1>
-          <p className="text-sm text-zinc-500">Global configurations for your portfolio</p>
-        </div>
-        {isViewer && (
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20 w-fit">
-            Viewer Mode (Read Only)
-          </div>
-        )}
-      </div>
+      <CmsHeader
+        title="System Settings"
+        description="Global configurations for your portfolio"
+        previewPath="/"
+      />
 
       <form onSubmit={save} className="grid gap-6 lg:gap-8 lg:grid-cols-2">
         <div className="space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 lg:p-8 backdrop-blur-md">

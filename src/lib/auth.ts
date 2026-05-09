@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Attach role to the user object that gets passed to jwt callback
-        (user as any).role = dbUser.role;
+        user.role = dbUser.role;
         user.id = dbUser._id.toString();
 
         return true;
@@ -92,15 +92,15 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       // User is only passed on the initial sign in
       if (user) {
-        token.role = (user as any).role || UserRole.VIEWER;
+        token.role = user.role || UserRole.VIEWER;
         token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).id = token.id;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
