@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
-import { ProjectService } from '@/services/projectService';
+import { SectionService } from '@/services/sectionService';
 import { requireAdmin } from '@/lib/api/admin';
 
 export async function GET() {
   try {
-    const projects = await ProjectService.getAllProjects();
-    return NextResponse.json(projects);
+    const sections = await SectionService.getAllSections();
+    return NextResponse.json(sections);
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Failed to fetch projects' },
+      { error: 'Failed to fetch sections', message: error.message },
       { status: 500 }
     );
   }
@@ -20,11 +20,11 @@ export async function POST(req: Request) {
     if (unauthorized) return unauthorized;
 
     const body = await req.json();
-    const project = await ProjectService.createProject(body);
-    return NextResponse.json(project, { status: 201 });
+    const section = await SectionService.createSection(body);
+    return NextResponse.json(section, { status: 201 });
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to create section', message: error.message },
       { status: 500 }
     );
   }

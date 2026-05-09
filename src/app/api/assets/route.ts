@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { AssetService } from '@/services/assetService';
+import { requireAdmin } from '@/lib/api/admin';
 
 /**
  * Handle asset registration.
@@ -20,6 +21,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const unauthorized = await requireAdmin();
+    if (unauthorized) return unauthorized;
+
     const body = await req.json();
     
     // Validate required fields
@@ -28,7 +32,7 @@ export async function POST(req: Request) {
     }
 
     const asset = await AssetService.registerAsset(body);
-    return NextResponse.json(asset, { status: 21 });
+    return NextResponse.json(asset, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to register asset' }, { status: 500 });
   }

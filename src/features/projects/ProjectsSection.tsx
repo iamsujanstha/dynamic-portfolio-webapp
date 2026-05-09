@@ -8,6 +8,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSp
 import { ExternalLink, Github, Loader2, Minus, ArrowUpRight, Zap } from 'lucide-react';
 import { fetchGitHubProjects } from '@/src/services/githubService';
 import { PROJECTS as STATIC_PROJECTS, Project } from '@/src/core';
+import { CMSData } from '@/src/app/page';
 
 const CATEGORIES = ['all', 'web', 'mobile', 'ai', 'design'];
 
@@ -18,7 +19,7 @@ const TAG_STYLES = [
   { text: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
 ];
 
-export const ProjectsSection = () => {
+export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -28,11 +29,25 @@ export const ProjectsSection = () => {
     const loadProjects = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchGitHubProjects();
-        if (data && data.length > 0) {
-          setProjects(data);
+        if (cmsData && cmsData.length > 0) {
+          const normalized = cmsData.map((p: any) => ({
+            id: p._id || p.id,
+            title: p.title,
+            description: p.description,
+            tags: p.tags || [],
+            category: p.category || 'web',
+            image: p.thumbnail || p.image,
+            link: p.url || p.link || '#',
+            github: p.github || '#'
+          }));
+          setProjects(normalized);
         } else {
-          setProjects(STATIC_PROJECTS);
+          const data = await fetchGitHubProjects();
+          if (data && data.length > 0) {
+            setProjects(data);
+          } else {
+            setProjects(STATIC_PROJECTS);
+          }
         }
       } catch (error) {
         setProjects(STATIC_PROJECTS);
@@ -41,7 +56,7 @@ export const ProjectsSection = () => {
       }
     };
     loadProjects();
-  }, []);
+  }, [cmsData]);
 
   const filteredProjects = projects.filter(
     (p) => activeCategory === 'all' || p.category === activeCategory
@@ -57,7 +72,7 @@ export const ProjectsSection = () => {
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-20">
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -76,7 +91,7 @@ export const ProjectsSection = () => {
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -86,11 +101,10 @@ export const ProjectsSection = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`relative px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                  activeCategory === cat
+                className={`relative px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeCategory === cat
                     ? 'text-bg-dark'
                     : 'text-text-main/40 hover:text-text-main'
-                }`}
+                  }`}
               >
                 {activeCategory === cat && (
                   <motion.div
@@ -108,7 +122,7 @@ export const ProjectsSection = () => {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-40 gap-6 text-text-main/20">
-          <motion.div 
+          <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
@@ -117,13 +131,13 @@ export const ProjectsSection = () => {
           <p className="font-mono tracking-[0.5em] uppercase text-[10px]">Loading Core System...</p>
         </div>
       ) : (
-        <div 
+        <div
           className="relative group/marquee"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <div className="flex gap-8 overflow-hidden py-10 px-4 md:px-0">
-            <motion.div 
+            <motion.div
               className="flex gap-8"
               animate={!isHovered && activeCategory === 'all' ? {
                 x: ["0%", "-33.333%"],
@@ -153,7 +167,7 @@ export const ProjectsSection = () => {
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   const springConfig = { damping: 30, stiffness: 400 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
@@ -163,23 +177,23 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
-
+  console.log({ project });
   return (
-    <div 
+    <div
       onMouseMove={onMouseMove}
       className="relative group/card w-[320px] md:w-[450px] shrink-0 h-[500px]"
     >
-      <motion.div 
+      <motion.div
         className="h-full bg-bg-card/50 backdrop-blur-md border border-border-main rounded-[2rem] overflow-hidden flex flex-col p-8 md:p-10 transition-all duration-700 group-hover/card:border-brand-primary/40 group-hover/card:-translate-y-4 shadow-2xl shadow-transparent group-hover/card:shadow-brand-primary/5"
       >
         <motion.div
-           className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
-           style={{
-             background: useTransform(
-               [smoothX, smoothY],
-               ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(var(--brand-primary-rgb), 0.1), transparent 40%)`
-             )
-           }}
+          className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300"
+          style={{
+            background: useTransform(
+              [smoothX, smoothY],
+              ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(var(--brand-primary-rgb), 0.1), transparent 40%)`
+            )
+          }}
         />
 
         <div className="relative z-10 flex flex-col h-full">
@@ -191,33 +205,33 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
               </h3>
             </div>
             <div className="w-10 h-10 rounded-full border border-border-main flex items-center justify-center text-text-main/40 group-hover/card:bg-brand-primary group-hover/card:text-bg-dark transition-all duration-500">
-               <ArrowUpRight size={18} />
+              <ArrowUpRight size={18} />
             </div>
           </div>
 
           <div className="relative w-full h-40 md:h-48 mb-8 rounded-2xl overflow-hidden bg-bg-dark/40 border border-border-main/50">
-            <img 
-              src={project.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'} 
+            <img
+              src={project.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'}
               alt={project.title}
               className="w-full h-full object-cover opacity-40 group-hover/card:scale-105 group-hover/card:opacity-80 transition-all duration-1000 ease-out grayscale group-hover/card:grayscale-0"
             />
             <div className="absolute inset-0 bg-linear-to-t from-bg-card to-transparent/60 opacity-60" />
-            
+
             <div className="absolute top-4 right-4 p-2 bg-bg-dark/80 backdrop-blur-md rounded-lg opacity-0 group-hover/card:opacity-100 transition-all transform translate-y-2 group-hover/card:translate-y-0">
-               <Zap size={14} className="text-brand-primary" />
+              <Zap size={14} className="text-brand-primary" />
             </div>
           </div>
 
           <p className="text-text-main/50 text-xs md:text-sm font-light leading-relaxed mb-auto line-clamp-3 whitespace-normal">
-             {project.description}
+            {project.description}
           </p>
 
           <div className="flex flex-wrap gap-1.5 mt-8 pt-6 border-t border-border-main/30 group-hover/card:opacity-0 transition-opacity duration-300">
             {project.tags.slice(0, 4).map((tag, i) => {
               const style = TAG_STYLES[i % TAG_STYLES.length];
               return (
-                <span 
-                  key={tag} 
+                <span
+                  key={tag}
                   className={`text-[7px] md:text-[8px] uppercase tracking-[0.15em] font-bold px-2.5 py-1 rounded-full border ${style.border} ${style.text} ${style.bg} backdrop-blur-sm whitespace-nowrap`}
                 >
                   {tag}
@@ -228,22 +242,22 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
         </div>
 
         <div className="absolute bottom-0 left-0 w-full p-8 md:p-10 flex gap-4 translate-y-full group-hover/card:translate-y-0 transition-transform duration-500 bg-bg-card/95 backdrop-blur-xl border-t border-border-main/30 z-20">
-           <a 
-             href={project.github} 
-             target="_blank"
-             rel="noopener noreferrer"
-             className="flex-1 py-4 bg-bg-dark/80 border border-border-main text-text-main/60 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-brand-primary hover:text-bg-dark hover:border-brand-primary transition-all flex items-center justify-center gap-2"
-           >
-             <Github size={14} /> Source
-           </a>
-           <a 
-             href={project.link} 
-             target="_blank"
-             rel="noopener noreferrer"
-             className="flex-1 py-4 bg-brand-primary text-bg-dark rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-primary/20"
-           >
-             Preview <ExternalLink size={14} />
-           </a>
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 py-4 bg-bg-dark/80 border border-border-main text-text-main/60 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-brand-primary hover:text-bg-dark hover:border-brand-primary transition-all flex items-center justify-center gap-2"
+          >
+            <Github size={14} /> Source
+          </a>
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 py-4 bg-brand-primary text-bg-dark rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-primary/20"
+          >
+            Preview <ExternalLink size={14} />
+          </a>
         </div>
       </motion.div>
     </div>

@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
-    const isAdmin = token?.role === 'ADMIN';
+    const isAdmin = String(token?.role || '').toLowerCase() === 'admin';
 
     // Authenticated user trying to access /admin but not an ADMIN → redirect
     if (req.nextUrl.pathname.startsWith('/admin') && !isAdmin) {

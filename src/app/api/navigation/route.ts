@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { NavigationService } from '@/services/navigationService';
+import { requireAdmin } from '@/lib/api/admin';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -15,6 +16,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const unauthorized = await requireAdmin();
+    if (unauthorized) return unauthorized;
+
     const body = await req.json();
     const nav = await NavigationService.updateNav(body.key, body.items);
     return NextResponse.json(nav);

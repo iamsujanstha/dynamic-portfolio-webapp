@@ -16,7 +16,9 @@ import { AIAssistant } from './components/AIAssistant';
 import { SEO } from './components/common';
 import { motion, useScroll, useSpring } from 'motion/react';
 
-export default function App() {
+import { CMSData } from './app/page';
+
+export default function App({ cmsData }: { cmsData?: CMSData }) {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -46,9 +48,9 @@ export default function App() {
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Hero />
-        <Projects />
-        <Skills />
+        <Hero cmsData={cmsData?.hero} />
+        <Projects cmsData={cmsData?.projects} />
+        <Skills cmsData={cmsData?.skills} />
         <Experience />
         <Contact />
       </main>

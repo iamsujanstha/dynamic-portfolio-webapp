@@ -7,6 +7,8 @@ import { ProjectService } from '@/services/projectService';
 import { AssetService } from '@/services/assetService';
 import { Settings, FileText, Layout, Folder, Plus, User } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
   

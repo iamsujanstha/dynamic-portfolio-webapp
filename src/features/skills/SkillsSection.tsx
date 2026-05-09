@@ -7,11 +7,23 @@ import { SKILLS } from '@/src/core';
 import { motion } from 'motion/react';
 import * as Icons from 'lucide-react';
 
-export const SkillsSection = () => {
+import { CMSData } from '@/src/app/page';
+
+export const SkillsSection = ({ cmsData }: { cmsData?: CMSData['skills'] }) => {
+  const displaySkills = cmsData?.content?.skills?.map((s: any) => {
+    if (typeof s === 'string') {
+      return { name: s, category: 'skill', icon: 'Terminal' };
+    }
+    return {
+      name: s.name || 'Unknown',
+      category: s.category || 'skill',
+      icon: s.icon || 'Terminal'
+    };
+  }) || SKILLS;
   return (
     <section id="skills" className="py-32 px-6 md:px-12 bg-text-main/5">
       <div className="max-w-7xl mx-auto">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
@@ -19,7 +31,7 @@ export const SkillsSection = () => {
           className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20"
         >
           <div>
-            <h2 className="text-4xl md:text-6xl font-display font-bold italic text-text-main uppercase">Expertise</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold italic text-text-main uppercase">{cmsData?.title || 'Expertise'}</h2>
             <p className="text-text-main/40 mt-4 font-light max-w-md">
               A comprehensive toolkit honed through years of professional development and continuous learning.
             </p>
@@ -34,7 +46,7 @@ export const SkillsSection = () => {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {SKILLS.map((skill, index) => {
+          {displaySkills.map((skill: any, index: number) => {
             const IconComponent = (Icons as any)[skill.icon] || Icons.Circle;
             return (
               <motion.div
@@ -43,7 +55,7 @@ export const SkillsSection = () => {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.1 }}
                 whileHover={{ y: -5 }}
-                transition={{ 
+                transition={{
                   delay: (index % 4) * 0.1,
                   duration: 0.5,
                   y: { type: 'spring', stiffness: 300 }
@@ -51,7 +63,7 @@ export const SkillsSection = () => {
                 className="group p-6 glass-card rounded-2xl hover:bg-brand-primary/[0.05] transition-all duration-300 border border-border-main hover:border-brand-primary/20"
               >
                 <div className="flex items-center gap-4">
-                  <motion.div 
+                  <motion.div
                     whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
                     transition={{ duration: 0.5 }}
                     className="w-10 h-10 rounded-xl bg-text-main/5 flex items-center justify-center text-brand-primary"

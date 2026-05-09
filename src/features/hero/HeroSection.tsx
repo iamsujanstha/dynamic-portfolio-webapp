@@ -6,8 +6,9 @@
 import { motion } from 'motion/react';
 import { MousePointer2, ArrowRight, Github, Twitter, Linkedin, FileText, Download } from 'lucide-react';
 import { Button } from '@/src/components/ui/Button';
+import { CMSData } from '@/src/app/page';
 
-export const HeroSection = () => {
+export const HeroSection = ({ cmsData }: { cmsData?: CMSData['hero'] }) => {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-bg-dark">
       {/* Background Texture & Gradients */}
@@ -25,7 +26,7 @@ export const HeroSection = () => {
           >
             <div className="w-12 h-[1px] bg-brand-primary" />
             <span className="text-brand-primary font-mono text-[10px] uppercase tracking-[0.4em] font-bold">
-              Senior Frontend Engineer
+              {cmsData?.title || 'Senior Frontend Engineer'}
             </span>
           </motion.div>
 
@@ -54,7 +55,13 @@ export const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-text-main/40 text-lg md:text-xl max-w-lg mb-12 font-light leading-[1.6] italic serif"
           >
-            Architecture-focused developer crafting high-performance digital experiences where <span className="text-text-main">Precision meets Performance.</span>
+            {cmsData?.subtitle ? (
+              <span dangerouslySetInnerHTML={{ __html: cmsData.subtitle }} />
+            ) : (
+              <>
+                Architecture-focused developer crafting high-performance digital experiences where <span className="text-text-main">Precision meets Performance.</span>
+              </>
+            )}
           </motion.p>
 
           <motion.div

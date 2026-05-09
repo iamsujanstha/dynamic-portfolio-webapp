@@ -6,10 +6,10 @@ import {
   FolderKanban, 
   Settings, 
   Image as ImageIcon,
-  LogOut,
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
+import { SignOutButton } from '@/components/admin/SignOutButton';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const menuItems = [
@@ -48,10 +48,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="p-4 border-t border-zinc-800">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-all text-sm font-medium">
-            <LogOut size={18} />
-            Sign Out
-          </button>
+          <SignOutButton />
         </div>
       </aside>
 

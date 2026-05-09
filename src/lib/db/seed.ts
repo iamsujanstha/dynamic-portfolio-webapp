@@ -31,7 +31,18 @@ export async function seedDatabase() {
     status: 'published',
     title: 'Expertise',
     content: {
-      skills: ['JavaScript / TypeScript', 'React / Next.js', 'Node.js / NestJS', 'Tailwind CSS', 'GraphQL', 'Docker / CI/CD', 'Jest', 'Redux Saga', 'NX Monorepo', 'WCAG Accessibility'],
+      skills: [
+        { name: 'JavaScript / TypeScript', icon: 'Code2' },
+        { name: 'React / Next.js', icon: 'Blocks' },
+        { name: 'Node.js / NestJS', icon: 'Server' },
+        { name: 'Tailwind CSS', icon: 'Palette' },
+        { name: 'GraphQL', icon: 'Database' },
+        { name: 'Docker / CI/CD', icon: 'Container' },
+        { name: 'Jest', icon: 'TestTube' },
+        { name: 'Redux Saga', icon: 'Workflow' },
+        { name: 'NX Monorepo', icon: 'Layers' },
+        { name: 'WCAG Accessibility', icon: 'Eye' }
+      ],
     },
     order: 1,
   });

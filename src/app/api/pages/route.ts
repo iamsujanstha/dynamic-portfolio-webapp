@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PageService } from '@/services/pageService';
+import { requireAdmin } from '@/lib/api/admin';
 
 /**
  * GET /api/pages
@@ -24,6 +25,9 @@ export async function GET() {
  */
 export async function POST(req: Request) {
   try {
+    const unauthorized = await requireAdmin();
+    if (unauthorized) return unauthorized;
+
     const body = await req.json();
     
     // In a real prod app, use Zod for strict validation here
@@ -32,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     const newPage = await PageService.createPage(body);
-    return NextResponse.json(newPage, { status: 21 });
+    return NextResponse.json(newPage, { status: 201 });
   } catch (error: any) {
     return NextResponse.json(
       { error: 'Failed to create page', message: error.message },
