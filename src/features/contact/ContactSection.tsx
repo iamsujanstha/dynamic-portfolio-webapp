@@ -67,7 +67,19 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
-export const ContactSection = () => {
+interface ContactProps {
+  settings?: {
+    location?: string;
+    contactEmail?: string;
+    contactNumber?: string;
+  };
+}
+
+export const ContactSection = ({ settings }: ContactProps) => {
+  const defaultLocation = settings?.location || 'Tanahun, Gandaki, Nepal';
+  const defaultEmail = settings?.contactEmail || 'sujan.shrestha@example.com';
+  const defaultPhone = settings?.contactNumber || '+977 9806545497';
+
   const {
     register,
     handleSubmit,
@@ -120,14 +132,14 @@ export const ContactSection = () => {
             <p className="text-text-main/40 mb-12 font-light leading-relaxed max-w-md">
               Have a visionary project or just want to chat about technology? I'm always open to discussing new opportunities.
             </p>
- 
+
             <div className="space-y-8">
               {[
-                { icon: MapPin, label: 'Location', value: 'Tanahun, Gandaki, Nepal' },
-                { icon: Mail, label: 'Email', value: 'sujan.sjv08@gmail.com' },
-                { icon: Phone, label: 'Phone', value: '+977 9806545497' },
+                { icon: MapPin, label: 'Location', value: defaultLocation },
+                { icon: Mail, label: 'Email', value: defaultEmail },
+                { icon: Phone, label: 'Phone', value: defaultPhone },
               ].map((item, index) => (
-                <motion.div 
+                <motion.div
                   key={item.label}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}

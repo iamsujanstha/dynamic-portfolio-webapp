@@ -94,14 +94,14 @@ export const EXPERIENCE: Experience[] = [
     company: 'Info Developers Pvt. Ltd.',
     period: '09/2023 - Present',
     description: [
-      'Developed a high-performance local LLM orchestration system using Ollama and FastAPI, enabling secure offline AI inference with real-time streaming capabilities.',
-      'Architected sophisticated RAG (Retrieval-Augmented Generation) and AI memory layers using Qdrant and pgvector to provide intelligent document grounding and cross-session context.',
-      'Worked with clients to update legacy systems by adding responsive design, keyboard navigation, and accessibility features (WCAG), improving usability and ensuring multi-device compatibility.',
-      'Optimized Core Web Vitals, reducing LCP from 2.78s to 1.95s and CLS from 0.21 to 0.09 by resolving layout shifts, using CSS aspect ratios, and minimizing reflows.',
-      'Managed several projects at the same time from start to finish, worked closely with different teams, made sure the work matched business goals, and delivered reliable, high-quality solutions.',
-      'Implemented a monorepo with NX to streamline development, allowing easy sharing of UI components and services between the web app and CMS.',
-      'Designed boilerplate code for new projects, integrated Storybook for UI components, facilitating development by providing clear visual examples.',
-      'Developed reusable Web Components with Lit, simplifying development, reducing code duplication, and speeding up feature delivery.'
+      "Developed a high-performance local LLM orchestration system using Ollama and FastAPI, enabling secure offline AI inference with real-time streaming capabilities.",
+      "Architected sophisticated RAG (Retrieval-Augmented Generation) and AI memory layers using Qdrant and pgvector to provide intelligent document grounding and cross-session context.",
+      "Worked with clients to update legacy systems by adding responsive design, keyboard navigation, and accessibility features (WCAG), improving usability and ensuring multi-device compatibility.",
+      "Optimized Core Web Vitals, reducing LCP from 2.78s to 1.95s and CLS from 0.21 to 0.09 by resolving layout shifts, using CSS aspect ratios, and minimizing reflows.",
+      "Managed several projects at the same time from start to finish, worked closely with different teams, made sure the work matched business goals, and delivered reliable, high-quality solutions.",
+      "Implemented a monorepo with NX to streamline development, allowing easy sharing of UI components and services between the web app and CMS.",
+      "Designed boilerplate code for new projects, integrated Storybook for UI components, facilitating development by providing clear visual examples.",
+      "Developed reusable Web Components with Lit, simplifying development, reducing code duplication, and speeding up feature delivery."
     ]
   },
   {
@@ -110,14 +110,14 @@ export const EXPERIENCE: Experience[] = [
     company: 'Aerion Technologies',
     period: '04/2019 - 09/2023',
     description: [
-      'Managed multiple projects from start to finish, collaborating with cross-functional teams to align with business goals and deliver high-quality solutions.',
-      'Developed and integrated backend features using NestJS, contributing to full-stack project functionality and improving data handling.',
-      'Collaborated with designers to iterate on designs, refining UI/UX elements and ensuring their compatibility with front-end implementation.',
-      'Set up a monorepo with NX to streamline development, allowing easy sharing of UI components and services between the web app and CMS.',
-      'Assisted in building and deploying backend services with NestJS, gaining experience in server-side development, authentication, and API management.',
-      'Used Redux Saga for managing asynchronous actions, including API calls and data synchronization, improving performance.',
-      'Integrated third-party APIs, including Zendesk script and Recommbee products, to provide additional functionalities.',
-      'Contributed to Agile development, participating in sprint planning and stand-ups to ensure timely feature delivery.'
+      "Managed multiple projects from start to finish, collaborating with cross-functional teams to align with business goals and deliver high-quality solutions.",
+      "Developed and integrated backend features using NestJS, contributing to full-stack project functionality and improving data handling.",
+      "Collaborated with designers to iterate on designs, refining UI/UX elements and ensuring their compatibility with front-end implementation.",
+      "Set up a monorepo with NX to streamline development, allowing easy sharing of UI components and services between the web app and CMS.",
+      "Assisted in building and deploying backend services with NestJS, gaining experience in server-side development, authentication, and API management.",
+      "Used Redux Saga for managing asynchronous actions, including API calls and data synchronization, improving performance.",
+      "Integrated third-party APIs, including Zendesk script and Recommbee products, to provide additional functionalities.",
+      "Contributed to Agile development, participating in sprint planning and stand-ups to ensure timely feature delivery."
     ]
   }
 ];

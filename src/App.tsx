@@ -48,11 +48,17 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Hero cmsData={cmsData?.hero} />
+        <Hero cmsData={cmsData?.hero} resumeUrl={cmsData?.settings?.resumeUrl} profilePicture={cmsData?.settings?.profilePicture} />
         <Projects cmsData={cmsData?.projects} />
         <Skills cmsData={cmsData?.skills} />
-        <Experience />
-        <Contact />
+        <Experience cmsData={cmsData?.experience} />
+        <Contact 
+          settings={{
+            location: cmsData?.settings?.location,
+            contactEmail: cmsData?.settings?.contactEmail,
+            contactNumber: cmsData?.settings?.contactNumber
+          }} 
+        />
       </main>
 
       <Footer />

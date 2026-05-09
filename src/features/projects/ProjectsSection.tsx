@@ -37,8 +37,8 @@ export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) 
             tags: p.tags || [],
             category: p.category || 'web',
             image: p.thumbnail || p.image,
-            link: p.url || p.link || '#',
-            github: p.github || '#'
+            link: p.links?.live || p.url || p.link || '#',
+            github: p.links?.github || p.github || '#'
           }));
           setProjects(normalized);
         } else {
@@ -102,8 +102,8 @@ export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`relative px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeCategory === cat
-                    ? 'text-bg-dark'
-                    : 'text-text-main/40 hover:text-text-main'
+                  ? 'text-bg-dark'
+                  : 'text-text-main/40 hover:text-text-main'
                   }`}
               >
                 {activeCategory === cat && (
@@ -144,7 +144,7 @@ export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) 
               } : {}}
               transition={{
                 x: {
-                  duration: Math.max(projects.length * 15, 60), // Increased multiplier and min duration for slower speed
+                  duration: Math.max(projects.length * 5, 6), // Increased multiplier and min duration for slower speed
                   repeat: Infinity,
                   ease: "linear",
                 }
@@ -177,7 +177,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
-  console.log({ project });
+
   return (
     <div
       onMouseMove={onMouseMove}
@@ -217,7 +217,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
             />
             <div className="absolute inset-0 bg-linear-to-t from-bg-card to-transparent/60 opacity-60" />
 
-            <div className="absolute top-4 right-4 p-2 bg-bg-dark/80 backdrop-blur-md rounded-lg opacity-0 group-hover/card:opacity-100 transition-all transform translate-y-2 group-hover/card:translate-y-0">
+            <div className="absolute top-4 right-4 p-1 bg-bg-dark/80 backdrop-blur-md rounded-lg opacity-0 group-hover/card:opacity-100 transition-all transform translate-y-2 group-hover/card:translate-y-0">
               <Zap size={14} className="text-brand-primary" />
             </div>
           </div>
@@ -226,7 +226,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
             {project.description}
           </p>
 
-          <div className="flex flex-wrap gap-1.5 mt-8 pt-6 border-t border-border-main/30 group-hover/card:opacity-0 transition-opacity duration-300">
+          <div className="flex flex-wrap gap-1.5 mt-8 pt-4 border-t border-border-main/30 group-hover/card:opacity-0 transition-opacity duration-300">
             {project.tags.slice(0, 4).map((tag, i) => {
               const style = TAG_STYLES[i % TAG_STYLES.length];
               return (

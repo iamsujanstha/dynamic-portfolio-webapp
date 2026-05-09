@@ -54,12 +54,53 @@ export async function seedDatabase() {
     order: 2,
   });
 
+  const experienceSection = await Section.create({
+    type: SectionType.EXPERIENCE_TIMELINE,
+    status: 'published',
+    title: 'CURRICULUM',
+    content: {
+      experiences: [
+        {
+          id: 1,
+          role: "Senior Frontend Engineer",
+          company: "Sopact",
+          period: "August 2022 - Present",
+          description: [
+            "Designed and developed scalable enterprise web applications using React, Next.js, and TypeScript, improving overall application performance by 40%.",
+            "Architected and implemented a micro-frontend structure using NX monorepo, increasing team development velocity by 30%.",
+            "Integrated WCAG 2.1 AA accessibility standards across all platforms."
+          ]
+        },
+        {
+          id: 2,
+          role: "Frontend Developer",
+          company: "Pruvit",
+          period: "April 2020 - July 2022",
+          description: [
+            "Built interactive, high-performance E-commerce interfaces with React and Redux Saga.",
+            "Collaborated with UI/UX designers to translate Figma designs into pixel-perfect, responsive web components.",
+            "Reduced bundle size by 25% through code splitting and lazy loading."
+          ]
+        }
+      ],
+      education: [
+        {
+          id: 1,
+          degree: "Bachelor of Science in Computer Science",
+          institution: "University of Technology",
+          period: "2016 - 2020"
+        }
+      ]
+    },
+    order: 3,
+  });
+
   // 3. Create Home Page
   const homePage = await Page.create({
     title: 'Home',
     slug: 'index',
     status: 'published',
-    sections: [heroSection._id, skillsSection._id, projectSection._id],
+    sections: [heroSection._id, skillsSection._id, projectSection._id, experienceSection._id],
     metadata: {
       title: 'Sujan Shrestha | Senior Frontend Engineer',
       description: 'Portfolio of Sujan Shrestha - Senior Frontend Engineer specializing in React, TypeScript, and high-performance web applications.',

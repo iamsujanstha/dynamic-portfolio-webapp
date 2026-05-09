@@ -1,9 +1,11 @@
 'use client';
 
-import { FormEvent, useMemo, useState, useTransition } from 'react';
+import { FormEvent, useEffect, useMemo, useState, useTransition, useRef } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, FileUp, Plus, Save, Trash2 } from 'lucide-react';
+import { CheckCircle2, FileUp, Plus, Save, Trash2, X } from 'lucide-react';
+import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 type CmsMode = 'pages' | 'projects' | 'assets' | 'settings';
 
@@ -39,12 +41,20 @@ const sectionTemplate = [
     order: 2,
     isActive: true,
     content: {
-      experience: [
+      experiences: [
         {
           role: 'Frontend Engineer',
           company: 'Company Name',
           period: '2024 - Present',
           description: ['Built accessible, high-performance web interfaces.'],
+        },
+      ],
+      education: [
+        {
+          id: 1,
+          degree: 'Bachelor of Science in Computer Science',
+          institution: 'University of Technology',
+          period: '2016 - 2020',
         },
       ],
     },
@@ -106,6 +116,44 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+// Utility for cropping
+function getCroppedImg(image: HTMLImageElement, crop: any): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+  canvas.width = crop.width;
+  canvas.height = crop.height;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return Promise.reject(new Error('No 2d context'));
+
+  ctx.drawImage(
+    image,
+    crop.x * scaleX,
+    crop.y * scaleY,
+    crop.width * scaleX,
+    crop.height * scaleY,
+    0,
+    0,
+    crop.width,
+    crop.height
+  );
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        resolve(blob);
+      },
+      'image/jpeg',
+      1
+    );
+  });
+}
+
 const inputClass = 'w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-blue-500';
 
 function StatusLine({ message, error }: { message: string; error: string }) {
@@ -117,6 +165,29 @@ function StatusLine({ message, error }: { message: string; error: string }) {
   );
 }
 
+function useStatusMessage() {
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!message && !error) return;
+    const timer = setTimeout(() => {
+      setMessage('');
+      setError('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [message, error]);
+
+  function clearStatus() {
+    setMessage('');
+    setError('');
+  }
+
+  const StatusDisplay = () => <StatusLine message={message} error={error} />;
+
+  return { setMessage, setError, clearStatus, StatusDisplay };
+}
+
 function PagesCms({ initialPages }: { initialPages: any[] }) {
   const [pages, setPages] = useState(initialPages);
   const [selectedId, setSelectedId] = useState(initialPages[0]?._id || 'new');
@@ -126,8 +197,7 @@ function PagesCms({ initialPages }: { initialPages: any[] }) {
   const [status, setStatus] = useState(selected?.status || 'published');
   const [description, setDescription] = useState(selected?.description || '');
   const [sections, setSections] = useState(stringifyJson(selected?.sections?.length ? selected.sections : sectionTemplate));
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { setMessage, setError, clearStatus, StatusDisplay } = useStatusMessage();
   const [isPending, startTransition] = useTransition();
 
   function choosePage(id: string) {
@@ -138,8 +208,7 @@ function PagesCms({ initialPages }: { initialPages: any[] }) {
     setStatus(page?.status || 'published');
     setDescription(page?.description || '');
     setSections(stringifyJson(page?.sections?.length ? page.sections : sectionTemplate));
-    setMessage('');
-    setError('');
+    clearStatus();
   }
 
   function save(event: FormEvent) {
@@ -223,7 +292,7 @@ function PagesCms({ initialPages }: { initialPages: any[] }) {
               <Trash2 size={16} /> Delete
             </button>
           </div>
-          <StatusLine message={message} error={error} />
+          <StatusDisplay />
         </form>
       </div>
     </>
@@ -244,8 +313,7 @@ function ProjectsCms({ initialProjects }: { initialProjects: any[] }) {
     live: selected?.links?.live || '',
     featured: Boolean(selected?.featured),
   });
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { setMessage, setError, clearStatus, StatusDisplay } = useStatusMessage();
   const [isPending, startTransition] = useTransition();
 
   function update(key: string, value: string | boolean) {
@@ -265,8 +333,7 @@ function ProjectsCms({ initialProjects }: { initialProjects: any[] }) {
       live: project?.links?.live || '',
       featured: Boolean(project?.featured),
     });
-    setMessage('');
-    setError('');
+    clearStatus();
   }
 
   function save(event: FormEvent) {
@@ -330,7 +397,7 @@ function ProjectsCms({ initialProjects }: { initialProjects: any[] }) {
           <button disabled={isPending} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50">
             <Save size={16} /> Save Project
           </button>
-          <StatusLine message={message} error={error} />
+          <StatusDisplay />
         </form>
       </div>
     </>
@@ -339,8 +406,7 @@ function ProjectsCms({ initialProjects }: { initialProjects: any[] }) {
 
 function AssetsCms({ initialAssets }: { initialAssets: any[] }) {
   const [assets, setAssets] = useState(initialAssets);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { setMessage, setError, clearStatus, StatusDisplay } = useStatusMessage();
   const [isPending, startTransition] = useTransition();
 
   function upload(event: FormEvent<HTMLFormElement>) {
@@ -369,7 +435,7 @@ function AssetsCms({ initialAssets }: { initialAssets: any[] }) {
           <FileUp size={16} /> Upload
         </button>
       </form>
-      <StatusLine message={message} error={error} />
+      <StatusDisplay />
       <div className="mt-6 overflow-hidden rounded-xl border border-zinc-800">
         {assets.map((asset) => (
           <div key={asset._id} className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 bg-zinc-900/60 px-5 py-4 last:border-b-0">
@@ -389,19 +455,84 @@ function SettingsCms({ initialSettings }: { initialSettings: any }) {
   const [form, setForm] = useState({
     siteName: initialSettings?.siteName || '',
     siteLogo: initialSettings?.siteLogo || '',
+    profilePicture: initialSettings?.profilePicture || '',
+    resumeUrl: initialSettings?.resumeUrl || '',
     contactEmail: initialSettings?.contactEmail || '',
+    contactNumber: initialSettings?.contactNumber || '',
+    location: initialSettings?.location || '',
     github: initialSettings?.socialLinks?.github || '',
     linkedin: initialSettings?.socialLinks?.linkedin || '',
     twitter: initialSettings?.socialLinks?.twitter || '',
     gaTrackingId: initialSettings?.gaTrackingId || '',
     maintenanceMode: Boolean(initialSettings?.maintenanceMode),
   });
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { setMessage, setError, clearStatus, StatusDisplay } = useStatusMessage();
   const [isPending, startTransition] = useTransition();
+
+  const [imgSrc, setImgSrc] = useState('');
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [crop, setCrop] = useState<Crop>();
+  const [completedCrop, setCompletedCrop] = useState<any>();
 
   function update(key: string, value: string | boolean) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      setCrop(undefined); 
+      const reader = new FileReader();
+      reader.addEventListener('load', () => setImgSrc(reader.result?.toString() || ''));
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  }
+
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget;
+    const crop = centerCrop(
+      makeAspectCrop({ unit: '%', width: 90 }, 4 / 5, width, height),
+      width,
+      height
+    );
+    setCrop(crop);
+  }
+
+  async function handleCropUpload() {
+    if (!completedCrop || !imgRef.current) return;
+    startTransition(async () => {
+      try {
+        setError('');
+        const blob = await getCroppedImg(imgRef.current!, completedCrop);
+        const formData = new FormData();
+        formData.append('file', blob, 'profile.jpg');
+        formData.append('name', 'Profile Picture');
+        const asset = await request('/api/assets/upload', { method: 'POST', body: formData });
+        update('profilePicture', asset.url);
+        setImgSrc('');
+        setMessage('Profile picture cropped and uploaded. Remember to click Save Settings!');
+      } catch (err: any) {
+        setError(err.message);
+      }
+    });
+  }
+
+  function handleResumeUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    startTransition(async () => {
+      try {
+        setError('');
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', 'Active Resume');
+        const asset = await request('/api/assets/upload', { method: 'POST', body: formData });
+        update('resumeUrl', asset.url);
+        setMessage('Resume uploaded. Remember to click Save Settings!');
+      } catch (err: any) {
+        setError(err.message);
+      }
+    });
   }
 
   function save(event: FormEvent) {
@@ -414,7 +545,11 @@ function SettingsCms({ initialSettings }: { initialSettings: any }) {
           body: JSON.stringify({
             siteName: form.siteName,
             siteLogo: form.siteLogo,
+            profilePicture: form.profilePicture,
+            resumeUrl: form.resumeUrl,
             contactEmail: form.contactEmail,
+            contactNumber: form.contactNumber,
+            location: form.location,
             gaTrackingId: form.gaTrackingId,
             maintenanceMode: form.maintenanceMode,
             socialLinks: {
@@ -435,11 +570,33 @@ function SettingsCms({ initialSettings }: { initialSettings: any }) {
     <>
       <CmsHeader title="Settings CMS" description="Manage site profile data, social links, analytics, and global toggles stored in MongoDB." />
       <form onSubmit={save} className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <Field label="Site Name"><input className={inputClass} value={form.siteName} onChange={(event) => update('siteName', event.target.value)} /></Field>
           <Field label="Contact Email"><input className={inputClass} value={form.contactEmail} onChange={(event) => update('contactEmail', event.target.value)} /></Field>
+          <Field label="Contact Number"><input className={inputClass} value={form.contactNumber} onChange={(event) => update('contactNumber', event.target.value)} /></Field>
         </div>
-        <Field label="Logo URL"><input className={inputClass} value={form.siteLogo} onChange={(event) => update('siteLogo', event.target.value)} /></Field>
+        <Field label="Location"><input className={inputClass} value={form.location} onChange={(event) => update('location', event.target.value)} /></Field>
+        
+        <div className="grid gap-4 md:grid-cols-2 items-end">
+          <Field label="Profile Picture (Upload & Crop)">
+            <div className="flex gap-2">
+              <input className={`${inputClass} flex-1`} value={form.profilePicture} onChange={(event) => update('profilePicture', event.target.value)} placeholder="/uploads/..." />
+              <label className="cursor-pointer flex items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-bold text-white hover:bg-blue-500">
+                <FileUp size={16} />
+                <input type="file" accept="image/*" className="hidden" onChange={onSelectFile} disabled={isPending} />
+              </label>
+            </div>
+          </Field>
+          <Field label="Resume (Upload PDF)">
+            <div className="flex gap-2">
+              <input className={`${inputClass} flex-1`} value={form.resumeUrl} onChange={(event) => update('resumeUrl', event.target.value)} placeholder="/uploads/..." />
+              <label className="cursor-pointer flex items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-bold text-white hover:bg-blue-500">
+                <FileUp size={16} />
+                <input type="file" accept="application/pdf" className="hidden" onChange={handleResumeUpload} disabled={isPending} />
+              </label>
+            </div>
+          </Field>
+        </div>
         <div className="grid gap-4 md:grid-cols-3">
           <Field label="GitHub"><input className={inputClass} value={form.github} onChange={(event) => update('github', event.target.value)} /></Field>
           <Field label="LinkedIn"><input className={inputClass} value={form.linkedin} onChange={(event) => update('linkedin', event.target.value)} /></Field>
@@ -453,8 +610,53 @@ function SettingsCms({ initialSettings }: { initialSettings: any }) {
         <button disabled={isPending} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50">
           <CheckCircle2 size={16} /> Save Settings
         </button>
-        <StatusLine message={message} error={error} />
+        <StatusDisplay />
       </form>
+
+      {/* Cropper Modal */}
+      {imgSrc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-2xl bg-zinc-900 border border-zinc-800 p-6 flex flex-col gap-6 max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold text-white">Crop Profile Picture</h3>
+              <button onClick={() => setImgSrc('')} className="text-zinc-400 hover:text-white p-2">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-auto bg-black/50 rounded-xl border border-zinc-800 flex items-center justify-center">
+              <ReactCrop
+                crop={crop}
+                onChange={(_, percentCrop) => setCrop(percentCrop)}
+                onComplete={(c) => setCompletedCrop(c)}
+                aspect={4 / 5}
+                className="max-h-[60vh]"
+              >
+                <img
+                  ref={imgRef}
+                  alt="Crop me"
+                  src={imgSrc}
+                  onLoad={onImageLoad}
+                  className="max-h-[60vh] object-contain"
+                />
+              </ReactCrop>
+            </div>
+
+            <div className="flex justify-end gap-4">
+              <button onClick={() => setImgSrc('')} className="px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white">
+                Cancel
+              </button>
+              <button 
+                onClick={handleCropUpload} 
+                disabled={isPending || !completedCrop} 
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50"
+              >
+                <Save size={16} /> Upload Cropped Image
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
