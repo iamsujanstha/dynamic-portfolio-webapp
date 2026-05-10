@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     // --- NEW LOGIC: Upload to Vercel Blob instead of local FS ---
     const blob = await put(file.name, file, {
       access: 'public',
+      addRandomSuffix: true,
     });
 
     const isPdf = file.type === 'application/pdf' || file.name.endsWith('.pdf');
