@@ -8,6 +8,7 @@ import { CheckCircle2, FileUp, Plus, Save, Trash2, User, X, ExternalLink } from 
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { sectionTemplate } from '@/core/constants';
@@ -46,6 +47,7 @@ async function request(path: string, options: RequestInit) {
 
 export function AdminCms({ mode, initialData }: Props) {
   const { data: session } = useSession();
+  const router = useRouter();
   const { getSimData, saveSimData } = useSimulation();
 
   // Use a cache to persist simulated changes between tab switches
@@ -66,12 +68,17 @@ export function AdminCms({ mode, initialData }: Props) {
     // They can still use simulation if they want, but initial load should be clean.
     const isAdmin = (session?.user as any)?.role === 'ADMIN';
 
-    // Try to load from service first
-    const saved = getSimData<any>(key);
-    if (saved && !isAdmin) {
-      setSimCache(prev => ({ ...prev, [mode]: saved }));
-    } else if (!simCache[mode]) {
+    // If we have fresh initialData from the server, we should probably prefer it if we are Admin
+    if (isAdmin) {
       setSimCache(prev => ({ ...prev, [mode]: initialData }));
+    } else {
+      // Try to load from service first for non-admins (simulation mode)
+      const saved = getSimData<any>(key);
+      if (saved) {
+        setSimCache(prev => ({ ...prev, [mode]: saved }));
+      } else if (!simCache[mode]) {
+        setSimCache(prev => ({ ...prev, [mode]: initialData }));
+      }
     }
   }, [mode, initialData, key, getSimData, session]);
 
@@ -79,6 +86,7 @@ export function AdminCms({ mode, initialData }: Props) {
   const handleUpdate = (newData: any) => {
     setSimCache(prev => ({ ...prev, [mode]: newData }));
     saveSimData(key, newData);
+    router.refresh();
   };
 
   if (mode === 'pages') return <PagesCms initialPages={currentData} onUpdate={handleUpdate} />;

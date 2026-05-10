@@ -6,6 +6,7 @@ import { PageService } from '@/services/pageService';
 import { ProjectService } from '@/services/projectService';
 import { AssetService } from '@/services/assetService';
 import { Settings, FileText, Layout, Folder, Plus, User, ShieldCheck } from 'lucide-react';
+import { SeedButton } from '@/src/components/admin/SeedButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -91,13 +92,7 @@ export default async function AdminDashboard() {
               <ShieldCheck size={16} /> Seed Locked (Read Only)
             </div>
           ) : (
-            <Link
-              href="/api/admin/seed"
-              target="_blank"
-              className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-all"
-            >
-              <Plus size={16} /> Trigger Database Seed
-            </Link>
+            <SeedButton />
           )}
         </div>
       </section>
