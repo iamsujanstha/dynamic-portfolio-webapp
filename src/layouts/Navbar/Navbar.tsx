@@ -40,7 +40,7 @@ export const Navbar = () => {
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
+
     // Observe all sections
     const sections = ['home', 'projects', 'skills', 'experience', 'contact'];
     sections.forEach(id => {
@@ -66,7 +66,7 @@ export const Navbar = () => {
     e.preventDefault();
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
-    
+
     if (element) {
       const offset = 100; // Increased offset for better visibility
       const elementPosition = element.getBoundingClientRect().top;
@@ -76,7 +76,7 @@ export const Navbar = () => {
         top: offsetPosition,
         behavior: 'smooth'
       });
-      
+
       // Force set active section immediately for better UX
       setActiveSection(targetId);
     }
@@ -94,25 +94,16 @@ export const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div 
+        <div
           className="flex items-center gap-4 group cursor-pointer"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <div className="relative">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-border-main transition-transform duration-500 group-hover:scale-110 relative">
-              <Image 
-                src="https://github.com/iamsujanstha.png" 
-                alt="Sujan" 
-                fill
-                className="object-cover grayscale group-hover:grayscale-0 transition-all"
-                sizes="40px"
-              />
-            </div>
             <div className="absolute -inset-1 border border-brand-primary/30 rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-sm font-black tracking-tighter text-text-main transition-colors group-hover:text-brand-primary">
-              &lt;Sujan /&gt;
+              <Image src="/logo.png" alt="Sujan" width={60} height={60} />
             </span>
             <span className="text-[9px] font-mono text-text-main/30 tracking-[0.3em] uppercase mt-1">Engineer</span>
           </div>
@@ -129,8 +120,8 @@ export const Navbar = () => {
                 onClick={(e) => handleNavClick(e, link.href)}
                 className={cn(
                   "px-4 py-2 text-[10px] font-black transition-all uppercase tracking-widest rounded-full",
-                  isActive 
-                    ? "bg-text-main text-bg-dark shadow-lg shadow-text-main/10" 
+                  isActive
+                    ? "bg-text-main text-bg-dark shadow-lg shadow-text-main/10"
                     : "text-text-main/40 hover:text-text-main hover:bg-bg-card"
                 )}
               >
@@ -141,36 +132,36 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
-           <button
-             onClick={toggleTheme}
-             className="w-10 h-10 glass-card rounded-full flex items-center justify-center text-text-main hover:bg-brand-primary/10 transition-all border-border-main"
-             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-           >
-             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-           </button>
-           <Link 
-             href="/admin" 
-             className={cn(
-               "flex items-center gap-2 px-6 py-2.5 text-[10px] font-black rounded-full transition-all uppercase tracking-widest border",
-               session 
-                 ? isViewer 
-                   ? "border-amber-500/50 bg-amber-500/5 text-amber-500 shadow-lg shadow-amber-500/10" 
-                   : "border-brand-primary/50 bg-brand-primary/5 text-brand-primary shadow-lg shadow-brand-primary/10"
-                 : "border-border-main text-text-main/60 hover:border-text-main hover:text-text-main"
-             )}
-           >
-             {session ? (
-               <>
-                 <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isViewer ? "bg-amber-500" : "bg-brand-primary")} />
-                 {isViewer ? 'Viewer Hub' : 'Admin Hub'}
-               </>
-             ) : (
-               <>
-                 <Terminal size={14} />
-                 Console Access
-               </>
-             )}
-           </Link>
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 glass-card rounded-full flex items-center justify-center text-text-main hover:bg-brand-primary/10 transition-all border-border-main"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <Link
+            href="/admin"
+            className={cn(
+              "flex items-center gap-2 px-6 py-2.5 text-[10px] font-black rounded-full transition-all uppercase tracking-widest border",
+              session
+                ? isViewer
+                  ? "border-amber-500/50 bg-amber-500/5 text-amber-500 shadow-lg shadow-amber-500/10"
+                  : "border-brand-primary/50 bg-brand-primary/5 text-brand-primary shadow-lg shadow-brand-primary/10"
+                : "border-border-main text-text-main/60 hover:border-text-main hover:text-text-main"
+            )}
+          >
+            {session ? (
+              <>
+                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isViewer ? "bg-amber-500" : "bg-brand-primary")} />
+                {isViewer ? 'Viewer Hub' : 'Admin Hub'}
+              </>
+            ) : (
+              <>
+                <Terminal size={14} />
+                Console Access
+              </>
+            )}
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -216,7 +207,7 @@ export const Navbar = () => {
                 >
                   {link.name}
                   {isActive && (
-                    <motion.div 
+                    <motion.div
                       layoutId="activeIndicator"
                       className="absolute -left-6 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-primary rounded-full"
                     />
@@ -224,13 +215,13 @@ export const Navbar = () => {
                 </a>
               );
             })}
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className={cn(
                 "mt-4 flex items-center gap-3 px-10 py-4 rounded-2xl text-lg font-bold border transition-all",
-                session 
-                  ? isViewer 
-                    ? "border-amber-500/30 bg-amber-500/5 text-amber-500" 
+                session
+                  ? isViewer
+                    ? "border-amber-500/30 bg-amber-500/5 text-amber-500"
                     : "border-brand-primary/30 bg-brand-primary/5 text-brand-primary"
                   : "border-border-main text-text-main hover:border-brand-primary"
               )}
