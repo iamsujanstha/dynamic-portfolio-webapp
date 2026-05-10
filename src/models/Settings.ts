@@ -3,6 +3,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISettings extends Document {
   siteName: string;
   siteLogo?: string; // Reference to Asset URL
+  firstName?: string;
+  lastName?: string;
+  profileDescription?: string;
   profilePicture?: string; // Reference to Profile Picture URL
   resumeUrl?: string; // Reference to active Resume PDF
   socialLinks: {
@@ -21,6 +24,9 @@ export interface ISettings extends Document {
 const SettingsSchema = new Schema<ISettings>({
   siteName: { type: String, default: 'My Portfolio' },
   siteLogo: String,
+  firstName: String,
+  lastName: String,
+  profileDescription: String,
   profilePicture: String,
   resumeUrl: String,
   socialLinks: {

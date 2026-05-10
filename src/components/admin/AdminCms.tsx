@@ -678,27 +678,37 @@ function AssetsCms({ initialAssets, onUpdate }: { initialAssets: any[], onUpdate
 }
 
 function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUpdate: (data: any) => void }) {
-  const [form, setForm] = useState(initialSettings || {
-    siteName: '',
-    siteLogo: '',
-    firstName: '',
-    lastName: '',
-    profileDescription: '',
-    profilePicture: '',
-    resumeUrl: '',
-    contactEmail: '',
-    contactNumber: '',
-    location: '',
-    github: '',
-    linkedin: '',
-    twitter: '',
-    gaTrackingId: '',
-    maintenanceMode: false,
-    primaryColor: '#2563eb',
+  const [form, setForm] = useState(() => {
+    const base = initialSettings || {};
+    return {
+      siteName: base.siteName || '',
+      siteLogo: base.siteLogo || '',
+      firstName: base.firstName || '',
+      lastName: base.lastName || '',
+      profileDescription: base.profileDescription || '',
+      profilePicture: base.profilePicture || '',
+      resumeUrl: base.resumeUrl || '',
+      contactEmail: base.contactEmail || '',
+      contactNumber: base.contactNumber || '',
+      location: base.location || '',
+      github: base.socialLinks?.github || '',
+      linkedin: base.socialLinks?.linkedin || '',
+      twitter: base.socialLinks?.twitter || '',
+      gaTrackingId: base.gaTrackingId || '',
+      maintenanceMode: base.maintenanceMode || false,
+      primaryColor: base.primaryColor || '#2563eb',
+    };
   });
 
   useEffect(() => {
-    if (initialSettings) setForm(initialSettings);
+    if (initialSettings) {
+      setForm({
+        ...initialSettings,
+        github: initialSettings.socialLinks?.github || '',
+        linkedin: initialSettings.socialLinks?.linkedin || '',
+        twitter: initialSettings.socialLinks?.twitter || '',
+      });
+    }
   }, [initialSettings]);
   const { setMessage, setError, clearStatus, StatusDisplay } = useStatusMessage();
   const [isPending, startTransition] = useTransition();
