@@ -1,10 +1,7 @@
-import { mkdir, writeFile } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { AssetService } from '@/services/assetService';
 import { requireAdmin } from '@/lib/api/admin';
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
 export async function POST(req: Request) {
   try {
@@ -12,27 +9,25 @@ export async function POST(req: Request) {
     if (unauthorized) return unauthorized;
 
     const formData = await req.formData();
-    const file = formData.get('file');
+    const file = formData.get('file') as File;
 
-    if (!(file instanceof File)) {
+    if (!file) {
       return NextResponse.json({ error: 'Missing file' }, { status: 400 });
     }
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
-    const uniqueName = `${Date.now()}-${safeName}`;
-    const bytes = Buffer.from(await file.arrayBuffer());
+    // --- NEW LOGIC: Upload to Vercel Blob instead of local FS ---
+    const blob = await put(file.name, file, {
+      access: 'public',
+    });
 
-    await mkdir(UPLOAD_DIR, { recursive: true });
-    await writeFile(path.join(UPLOAD_DIR, uniqueName), bytes);
-
-    const isPdf = file.type === 'application/pdf' || safeName.endsWith('.pdf');
+    const isPdf = file.type === 'application/pdf' || file.name.endsWith('.pdf');
     const asset = await AssetService.registerAsset({
       name: formData.get('name')?.toString() || file.name,
-      url: `/uploads/${uniqueName}`,
+      url: blob.url, // Use the new blob URL
       type: isPdf ? 'PDF' : 'IMAGE',
       size: file.size,
       mimeType: file.type,
-      tags: formData.get('tags')?.toString().split(',').map((tag) => tag.trim()).filter(Boolean) || [],
+      tags: formData.get('tags')?.toString().split(',').map(t => t.trim()).filter(Boolean) || [],
     });
 
     return NextResponse.json(asset, { status: 201 });
