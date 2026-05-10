@@ -1,8 +1,9 @@
-import React from 'react'
+import React from 'react';
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import '../index.css';
 import { Providers } from './providers';
+import { validateSystemIdentity } from '@/lib/security';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -53,9 +54,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isVerified = validateSystemIdentity();
+
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body>
+      {/* If identity is not verified, the entire site is visually broken */}
+      <body className={!isVerified ? 'grayscale sepia contrast-125 brightness-75 blur-[1px] cursor-not-allowed selection:bg-red-900 selection:text-white' : ''}>
         <Providers>{children}</Providers>
       </body>
     </html>

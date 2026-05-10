@@ -114,8 +114,12 @@ export const Footer = ({
 
         {/* Bottom Section: Legal & Credits */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6 text-text-main/20 text-[9px] uppercase tracking-[0.3em]">
-            <p>&copy; {currentYear} {firstName} {lastName}. BUILT FOR EXCELLENCE.</p>
+          <div className="flex flex-col md:flex-row items-center gap-6 text-text-main/30 text-[9px] uppercase tracking-[0.2em] font-medium">
+            <p>&copy; {currentYear} {firstName} {lastName}. ALL RIGHTS RESERVED.</p>
+            <span className="hidden md:block w-1 h-1 rounded-full bg-text-main/10" />
+            <p className="flex items-center gap-2">
+              PROPRIETARY ENGINE <span className="text-brand-primary/50 text-[7px] border border-brand-primary/20 px-1 rounded">V1.0</span>
+            </p>
           </div>
 
           <div className="flex items-center gap-8">

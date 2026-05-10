@@ -18,6 +18,7 @@ type CmsMode = 'pages' | 'projects' | 'assets' | 'settings';
 type Props = {
   mode: CmsMode;
   initialData: any;
+  isVerified?: boolean;
 };
 
 function stringifyJson(value: unknown) {
@@ -45,7 +46,7 @@ async function request(path: string, options: RequestInit) {
   return response.json();
 }
 
-export function AdminCms({ mode, initialData }: Props) {
+export function AdminCms({ mode, initialData, isVerified = true }: Props) {
   const { data: session } = useSession();
   const router = useRouter();
   const { getSimData, saveSimData } = useSimulation();
@@ -89,10 +90,26 @@ export function AdminCms({ mode, initialData }: Props) {
     router.refresh();
   };
 
-  if (mode === 'pages') return <PagesCms initialPages={currentData} onUpdate={handleUpdate} />;
-  if (mode === 'projects') return <ProjectsCms initialProjects={currentData} onUpdate={handleUpdate} />;
-  if (mode === 'assets') return <AssetsCms initialAssets={currentData} onUpdate={handleUpdate} />;
-  return <SettingsCms initialSettings={currentData} onUpdate={handleUpdate} />;
+  return (
+    <div className={`flex flex-col min-h-[calc(100vh-200px)] transition-all duration-700 ${!isVerified ? 'blur-[2px] grayscale skew-y-1 pointer-events-none select-none opacity-50' : ''}`}>
+      <div className="flex-grow">
+        {mode === 'pages' && <PagesCms initialPages={currentData} onUpdate={handleUpdate} isVerified={isVerified} />}
+        {mode === 'projects' && <ProjectsCms initialProjects={currentData} onUpdate={handleUpdate} isVerified={isVerified} />}
+        {mode === 'assets' && <AssetsCms initialAssets={currentData} onUpdate={handleUpdate} isVerified={isVerified} />}
+        {mode === 'settings' && <SettingsCms initialSettings={currentData} onUpdate={handleUpdate} isVerified={isVerified} />}
+      </div>
+      
+      <footer className="mt-12 pt-8 border-t border-zinc-800/50 text-center">
+        <p className="text-zinc-500 text-xs tracking-widest uppercase flex items-center justify-center gap-2">
+          <span>&copy; {new Date().getFullYear()} Sujan Shrestha</span>
+          <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+          <span>Dynamic Portfolio Engine v1.0.0</span>
+          <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+          <span className="text-blue-500/50">Licensed for Personal Use</span>
+        </p>
+      </footer>
+    </div>
+  );
 }
 
 function CmsHeader({ title, description, previewPath = '/' }: { title: string; description: string; previewPath?: string }) {
@@ -225,7 +242,7 @@ function useStatusMessage() {
   return { setMessage, setError, clearStatus, StatusDisplay };
 }
 
-function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (data: any[]) => void }) {
+function PagesCms({ initialPages, onUpdate, isVerified = true }: { initialPages: any[], onUpdate: (data: any[]) => void, isVerified?: boolean }) {
   const [pages, setPages] = useState(initialPages);
 
   useEffect(() => {
@@ -414,8 +431,8 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
           </Field>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-zinc-800 gap-4">
             <div className="flex flex-wrap gap-3">
-              <button type="submit" disabled={isPending} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all">
-                <Save size={16} /> {isViewer ? 'Simulate Save' : 'Save Page'}
+              <button type="submit" disabled={isPending || !isVerified} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all">
+                {isVerified && <Save size={16} />} {isVerified ? (isViewer ? 'Simulate Save' : 'Save Page') : 'REPRODUCTION LOCKED'}
               </button>
               {selectedId !== 'new' && (
                 <button type="button" onClick={() => removePage()} disabled={isPending} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 transition-all">
@@ -432,7 +449,7 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
   );
 }
 
-function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], onUpdate: (data: any[]) => void }) {
+function ProjectsCms({ initialProjects, onUpdate, isVerified = true }: { initialProjects: any[], onUpdate: (data: any[]) => void, isVerified?: boolean }) {
   const [projects, setProjects] = useState(initialProjects);
 
   useEffect(() => {
@@ -594,8 +611,8 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
             <span className="font-medium">Featured project</span>
           </label>
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-zinc-800">
-            <button disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all shadow-lg shadow-blue-500/20">
-              <Save size={16} /> {isViewer ? 'Simulate Save' : 'Save Project'}
+            <button disabled={isPending || !isVerified} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition-all shadow-lg shadow-blue-500/20">
+              {isVerified && <Save size={16} />} {isVerified ? (isViewer ? 'Simulate Save' : 'Save Project') : 'ACTION BLOCKED'}
             </button>
             {selectedId !== 'new' && (
               <button type="button" onClick={removeProject} disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 px-6 py-3 text-sm font-medium text-zinc-400 hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 transition-all">
@@ -610,7 +627,7 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
   );
 }
 
-function AssetsCms({ initialAssets, onUpdate }: { initialAssets: any[], onUpdate: (data: any[]) => void }) {
+function AssetsCms({ initialAssets, onUpdate, isVerified = true }: { initialAssets: any[], onUpdate: (data: any[]) => void, isVerified?: boolean }) {
   const [assets, setAssets] = useState(initialAssets);
 
   useEffect(() => {
@@ -685,7 +702,7 @@ function AssetsCms({ initialAssets, onUpdate }: { initialAssets: any[], onUpdate
   );
 }
 
-function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUpdate: (data: any) => void }) {
+function SettingsCms({ initialSettings, onUpdate, isVerified = true }: { initialSettings: any, onUpdate: (data: any) => void, isVerified?: boolean }) {
   const [form, setForm] = useState(() => {
     const base = initialSettings || {};
     return {
@@ -992,8 +1009,8 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
         </div>
 
         <div className="lg:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between border-t border-zinc-800 pt-6 gap-6">
-          <button disabled={isPending} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-50 transition-all shadow-2xl active:scale-95">
-            <CheckCircle2 size={16} /> {isViewer ? 'Simulate Save' : 'Save All Settings'}
+          <button disabled={isPending || !isVerified} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-xs font-black uppercase tracking-widest text-black hover:bg-zinc-200 disabled:opacity-50 transition-all shadow-2xl active:scale-95">
+            {isVerified && <CheckCircle2 size={16} />} {isVerified ? (isViewer ? 'Simulate Save' : 'Save All Settings') : 'SAVE DISABLED — UNAUTHORIZED'}
           </button>
           <div className="w-full sm:w-auto overflow-hidden">
             <StatusDisplay />
@@ -1033,7 +1050,7 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
                 disabled={isPending || !completedCrop}
                 className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-blue-500/20 active:scale-95"
               >
-                <Save size={16} /> Apply & Upload
+                {isVerified && <Save size={16} />} {isVerified ? 'Apply & Upload' : 'UPLOAD DISABLED'}
               </button>
             </div>
           </div>
