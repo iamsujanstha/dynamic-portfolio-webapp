@@ -92,9 +92,9 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Hero 
-          cmsData={effectiveData?.hero} 
-          resumeUrl={effectiveData?.settings?.resumeUrl} 
+        <Hero
+          cmsData={effectiveData?.hero}
+          resumeUrl={effectiveData?.settings?.resumeUrl}
           profilePicture={effectiveData?.settings?.profilePicture}
           firstName={effectiveData?.settings?.firstName}
           lastName={effectiveData?.settings?.lastName}
@@ -114,7 +114,7 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
         />
       </main>
 
-      <Footer 
+      <Footer
         firstName={effectiveData?.settings?.firstName}
         lastName={effectiveData?.settings?.lastName}
         githubUrl={effectiveData?.settings?.github}
