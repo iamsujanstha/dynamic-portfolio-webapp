@@ -6,6 +6,10 @@ export async function POST() {
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
 
-  const result = await seedDatabase();
-  return NextResponse.json(result);
+  try {
+    const result = await seedDatabase();
+    return NextResponse.json(result);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
