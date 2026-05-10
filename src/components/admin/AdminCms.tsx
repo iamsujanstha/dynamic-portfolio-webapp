@@ -45,6 +45,7 @@ async function request(path: string, options: RequestInit) {
 }
 
 export function AdminCms({ mode, initialData }: Props) {
+  const { data: session } = useSession();
   const { getSimData, saveSimData } = useSimulation();
 
   // Use a cache to persist simulated changes between tab switches
@@ -61,14 +62,18 @@ export function AdminCms({ mode, initialData }: Props) {
   const key = simKeyMap[mode];
 
   useEffect(() => {
+    // Admins should always see the latest DB data first. 
+    // They can still use simulation if they want, but initial load should be clean.
+    const isAdmin = (session?.user as any)?.role === 'ADMIN';
+
     // Try to load from service first
     const saved = getSimData<any>(key);
-    if (saved) {
+    if (saved && !isAdmin) {
       setSimCache(prev => ({ ...prev, [mode]: saved }));
     } else if (!simCache[mode]) {
       setSimCache(prev => ({ ...prev, [mode]: initialData }));
     }
-  }, [mode, initialData, key, getSimData]);
+  }, [mode, initialData, key, getSimData, session]);
 
   const currentData = simCache[mode] || initialData;
   const handleUpdate = (newData: any) => {
@@ -229,6 +234,7 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
   const [isPending, startTransition] = useTransition();
   const { data: session } = useSession();
   const isViewer = (session?.user as any)?.role === 'VIEWER';
+  const isAdmin = (session?.user as any)?.role === 'ADMIN';
 
   function choosePage(id: string) {
     setSelectedId(id);
@@ -302,9 +308,9 @@ function PagesCms({ initialPages, onUpdate }: { initialPages: any[], onUpdate: (
 
         const next = isNew ? [saved, ...pages] : pages.map((page) => page._id === selectedId ? saved : page);
         setPages(next);
-        onUpdate(next);
+        onUpdate(next); // Sync parent cache with DB data
         setSelectedId(saved._id);
-        setMessage('Page saved. Published sections will render on the site.');
+        setMessage('Page saved and synced with database.');
       } catch (err: any) {
         setError(err.message);
       }
@@ -506,9 +512,11 @@ function ProjectsCms({ initialProjects, onUpdate }: { initialProjects: any[], on
           method: isNew ? 'POST' : 'PATCH',
           body: JSON.stringify(payload),
         });
-        setProjects(isNew ? [saved, ...projects] : projects.map((project) => project._id === selectedId ? saved : project));
+        const next = isNew ? [saved, ...projects] : projects.map((project) => project._id === selectedId ? saved : project);
+        setProjects(next);
+        onUpdate(next); // Sync parent cache with DB data
         setSelectedId(saved._id);
-        setMessage('Project saved.');
+        setMessage('Project saved and synced with database.');
       } catch (err: any) {
         setError(err.message);
       }
@@ -810,7 +818,8 @@ function SettingsCms({ initialSettings, onUpdate }: { initialSettings: any, onUp
             },
           }),
         });
-        setMessage('Settings saved.');
+        onUpdate(form); // Sync parent cache with DB data
+        setMessage('Settings saved successfully and synced with database.');
       } catch (err: any) {
         setError(err.message);
       }
