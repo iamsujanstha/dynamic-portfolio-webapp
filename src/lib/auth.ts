@@ -19,41 +19,45 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        try {
+          await dbConnect();
+          console.log('Auth: DB connected successfully');
 
-        // 1. Check for Bootstrap Admin (from .env)
-        // This allows initial login before the DB is seeded
-        const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-        const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
-        const envAdminPass = process.env.ADMIN_PASSWORD || 'password123';
+          // 1. Database Lookup (Primary)
+          const user = await User.findOne({ email: credentials.email }).select('+password');
+          console.log('Auth: User lookup result:', user ? 'User found' : 'User not found');
 
-        if (
-          (credentials.email === envAdminEmail || credentials.email === envAdminUser) && 
-          credentials.password === envAdminPass
-        ) {
-          return {
-            id: 'admin-bootstrap',
-            name: 'System Admin',
-            email: envAdminEmail,
-            role: UserRole.ADMIN
-          };
-        }
+          if (user) {
+            const isMatch = await bcrypt.compare(credentials.password, user.password || '');
+            if (isMatch) {
+              return {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                role: user.role
+              };
+            }
+          }
 
-        await dbConnect();
+          // 2. Check for Bootstrap Admin (Fallback)
+          const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+          const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
+          const envAdminPass = process.env.ADMIN_PASSWORD || 'password123';
 
-        // 2. Database Lookup
-        // Find user by email and explicitly select password
-        const user = await User.findOne({ email: credentials.email }).select('+password');
-
-        if (!user) return null;
-
-        const isMatch = await bcrypt.compare(credentials.password, user.password || '');
-        if (isMatch) {
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: user.role
-          };
+          if (
+            (credentials.email === envAdminEmail || credentials.email === envAdminUser) &&
+            credentials.password === envAdminPass
+          ) {
+            return {
+              id: 'admin-bootstrap',
+              name: 'System Admin',
+              email: envAdminEmail,
+              role: UserRole.ADMIN
+            };
+          }
+        } catch (error) {
+          console.error('Auth: Error during authorize:', error);
+          throw error;
         }
 
         return null;

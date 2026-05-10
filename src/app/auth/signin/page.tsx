@@ -19,6 +19,7 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
+      console.log('SignIn: Initiating credentials sign in...');
       const res = await signIn('credentials', {
         redirect: false,
         email,
@@ -26,13 +27,17 @@ export default function SignInPage() {
         callbackUrl: '/admin'
       });
 
+      console.log('SignIn: Result received:', res);
+
       if (res?.error) {
         setError('Access Denied. Check your credentials.');
         setLoading(false);
       } else {
-        router.push('/admin');
+        console.log('SignIn: Success, redirecting to /admin...');
+        window.location.href = '/admin';
       }
     } catch (err) {
+      console.error('SignIn: Catch block error:', err);
       setError('A system error occurred.');
       setLoading(false);
     }
