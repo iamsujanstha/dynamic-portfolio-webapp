@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import '../index.css';
 import { Providers } from './providers';
 import { validateSystemIdentity } from '@/lib/security';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -61,6 +62,7 @@ export default function RootLayout({
       {/* If identity is not verified, the entire site is visually broken */}
       <body className={!isVerified ? 'grayscale sepia contrast-125 brightness-75 blur-[1px] cursor-not-allowed selection:bg-red-900 selection:text-white' : ''}>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
