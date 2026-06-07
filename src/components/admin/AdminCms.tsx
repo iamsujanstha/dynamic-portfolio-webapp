@@ -962,7 +962,11 @@ function SettingsCms({ initialSettings, onUpdate, isVerified = true }: { initial
               <div className="relative aspect-square max-w-[240px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 mx-auto sm:mx-0">
                 {form.profilePicture ? (
                   <Image 
-                    src={form.profilePicture} 
+                    src={
+                      form.profilePicture.startsWith('/') || form.profilePicture.startsWith('http://') || form.profilePicture.startsWith('https://')
+                        ? form.profilePicture
+                        : `https://${form.profilePicture}`
+                    }
                     alt="Profile" 
                     fill 
                     className="object-cover"

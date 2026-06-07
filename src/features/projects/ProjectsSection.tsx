@@ -165,6 +165,12 @@ export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) 
   );
 };
 
+const normalizeImageSrc = (src?: string) => {
+  if (!src) return undefined;
+  if (src.startsWith('/') || src.startsWith('http://') || src.startsWith('https://')) return src;
+  return `https://${src}`;
+};
+
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -212,7 +218,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
 
           <div className="relative w-full h-40 md:h-48 mb-8 rounded-2xl overflow-hidden bg-bg-dark/40 border border-border-main/50">
             <Image
-              src={project.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'}
+              src={normalizeImageSrc(project.image) || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'}
               alt={project.title}
               fill
               className="object-cover opacity-40 group-hover/card:scale-105 group-hover/card:opacity-80 transition-all duration-1000 ease-out grayscale group-hover/card:grayscale-0"

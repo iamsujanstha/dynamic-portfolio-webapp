@@ -28,7 +28,16 @@ export const HeroSection = ({
   linkedinUrl?: string;
 }) => {
   const defaultResumeUrl = resumeUrl || '/resume.pdf';
-  const displayImage = profilePicture || 'https://github.com/iamsujanstha.png';
+
+  // Normalize the image URL: bare domain names (e.g. "sujankshrestha.com.np") are
+  // not valid for next/image — they must be absolute URLs or root-relative paths.
+  const normalizeImageSrc = (src?: string) => {
+    if (!src) return undefined;
+    if (src.startsWith('/') || src.startsWith('http://') || src.startsWith('https://')) return src;
+    return `https://${src}`;
+  };
+
+  const displayImage = normalizeImageSrc(profilePicture) || 'https://github.com/iamsujanstha.png';
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-bg-dark">
