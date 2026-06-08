@@ -15,7 +15,7 @@ export default async function AdminResumePage() {
   if (!isVerified) redirect('/admin');
 
   return (
-    <div className="min-h-[calc(100vh-80px)]">
+    <div className="h-full flex flex-col">
       <ResumeEditor />
     </div>
   );

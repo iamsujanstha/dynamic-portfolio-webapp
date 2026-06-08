@@ -127,8 +127,8 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A] pt-16 lg:pt-0">
-        <div className="p-6 lg:p-10 max-w-7xl mx-auto">
+      <main className="flex-1 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A] pt-16 lg:pt-0 flex flex-col">
+        <div className="p-6 lg:p-10 max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
           {children}
         </div>
       </main>
