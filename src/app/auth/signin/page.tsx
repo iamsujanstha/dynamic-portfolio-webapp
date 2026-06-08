@@ -9,28 +9,73 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [showVerification, setShowVerification] = useState(false);
+  const [targetEmail, setTargetEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePreSignIn = async () => {
     setError('');
     setLoading(true);
 
     try {
-      console.log('SignIn: Initiating credentials sign in...');
+      console.log('SignIn: Initiating pre-signin checks...');
+      const response = await fetch('/api/auth/pre-signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Access Denied. Check your credentials.');
+        setLoading(false);
+        return;
+      }
+
+      if (data.requiresVerification) {
+        setTargetEmail(data.email || email);
+        setShowVerification(true);
+        setLoading(false);
+      } else {
+        // Log in directly if no verification is required
+        await completeSignIn();
+      }
+    } catch (err) {
+      console.error('SignIn: Pre-signin error:', err);
+      setError('A system error occurred.');
+      setLoading(false);
+    }
+  };
+
+  const handleVerifySubmit = async () => {
+    if (code.length !== 6) {
+      setError('Please enter a 6-digit verification code.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    await completeSignIn(code);
+  };
+
+  const completeSignIn = async (otpCode?: string) => {
+    try {
+      console.log('SignIn: Completing credentials sign in...');
       const res = await signIn('credentials', {
         redirect: false,
         email,
         password,
+        code: otpCode || '',
         callbackUrl: '/admin'
       });
 
       console.log('SignIn: Result received:', res);
 
       if (res?.error) {
-        setError('Access Denied. Check your credentials.');
+        setError(otpCode ? 'Invalid or expired verification code.' : 'Access Denied. Check your credentials.');
         setLoading(false);
       } else {
         console.log('SignIn: Success, redirecting to /admin...');
@@ -40,6 +85,15 @@ export default function SignInPage() {
       console.error('SignIn: Catch block error:', err);
       setError('A system error occurred.');
       setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (showVerification) {
+      await handleVerifySubmit();
+    } else {
+      await handlePreSignIn();
     }
   };
 
@@ -112,48 +166,119 @@ export default function SignInPage() {
               )}
             </AnimatePresence>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Email</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-colors" size={18} />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                  placeholder="Email address"
-                />
-              </div>
-            </div>
+            <AnimatePresence mode="wait">
+              {!showVerification ? (
+                <motion.div
+                  key="credentials"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-5"
+                >
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Email</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-colors" size={18} />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                        className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
+                        placeholder="Email address"
+                      />
+                    </div>
+                  </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-colors" size={18} />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Password</label>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-colors" size={18} />
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={loading}
+                        className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full relative group overflow-hidden bg-white hover:bg-zinc-100 text-black font-black py-4 px-4 rounded-2xl transition-all mt-2 active:scale-[0.98] disabled:opacity-50"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                {loading ? 'Validating...' : 'Enter System'}
-                {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
-              </span>
-            </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full relative group overflow-hidden bg-white hover:bg-zinc-100 text-black font-black py-4 px-4 rounded-2xl transition-all mt-2 active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {loading ? 'Validating...' : 'Enter System'}
+                      {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+                    </span>
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="verification"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-5"
+                >
+                  <div className="text-center mb-2">
+                    <p className="text-xs text-zinc-400">
+                      We sent a 6-digit verification code to
+                    </p>
+                    <p className="text-xs text-blue-400 font-bold mt-1">
+                      {targetEmail}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Verification Code</label>
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        pattern="\d{6}"
+                        maxLength={6}
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                        required
+                        disabled={loading}
+                        className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-4 text-center text-2xl tracking-[0.6em] font-mono focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-800"
+                        placeholder="000000"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full relative group overflow-hidden bg-white hover:bg-zinc-100 text-black font-black py-4 px-4 rounded-2xl transition-all mt-2 active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {loading ? 'Verifying...' : 'Verify Code'}
+                      {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowVerification(false);
+                      setCode('');
+                      setError('');
+                    }}
+                    className="w-full text-zinc-500 hover:text-zinc-300 text-xs font-semibold text-center mt-2 transition-colors"
+                  >
+                    Back to Login
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
 
           <div className="my-8 flex items-center gap-4">

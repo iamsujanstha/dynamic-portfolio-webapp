@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/src/lib/db/mongodb';
 import User, { UserRole } from '@/src/models/User';
+import VerificationCode from '@/src/models/VerificationCode';
 import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
@@ -15,7 +16,8 @@ export const authOptions: NextAuthOptions = {
       name: 'Admin Login',
       credentials: {
         email: { label: "Email", type: "email", placeholder: "admin@example.com" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        code: { label: "Verification Code", type: "text" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -23,14 +25,31 @@ export const authOptions: NextAuthOptions = {
           await dbConnect();
           console.log('Auth: DB connected successfully');
 
+          // Normalize target email for bootstrap admin check
+          const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+          const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
+          const envAdminPass = process.env.ADMIN_PASSWORD || 'password123';
+
+          let lookupEmail = credentials.email;
+          let isBootstrap = false;
+          if (
+            (credentials.email === envAdminEmail || credentials.email === envAdminUser) &&
+            credentials.password === envAdminPass
+          ) {
+            isBootstrap = true;
+            lookupEmail = envAdminEmail;
+          }
+
           // 1. Database Lookup (Primary)
           const user = await User.findOne({ email: credentials.email }).select('+password');
           console.log('Auth: User lookup result:', user ? 'User found' : 'User not found');
 
+          let authenticatedUser = null;
+
           if (user) {
             const isMatch = await bcrypt.compare(credentials.password, user.password || '');
             if (isMatch) {
-              return {
+              authenticatedUser = {
                 id: user._id.toString(),
                 name: user.name,
                 email: user.email,
@@ -40,27 +59,51 @@ export const authOptions: NextAuthOptions = {
           }
 
           // 2. Check for Bootstrap Admin (Fallback)
-          const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-          const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
-          const envAdminPass = process.env.ADMIN_PASSWORD || 'password123';
-
-          if (
-            (credentials.email === envAdminEmail || credentials.email === envAdminUser) &&
-            credentials.password === envAdminPass
-          ) {
-            return {
+          if (!authenticatedUser && isBootstrap) {
+            authenticatedUser = {
               id: 'admin-bootstrap',
               name: 'System Admin',
               email: envAdminEmail,
               role: UserRole.ADMIN
             };
           }
+
+          if (!authenticatedUser) {
+            return null;
+          }
+
+          // Check if verification code is required (only for admins)
+          if (authenticatedUser.role === UserRole.ADMIN) {
+            if (!credentials.code) {
+              throw new Error('Verification code is required');
+            }
+
+            // Find matching code in DB
+            const codeRecord = await VerificationCode.findOne({
+              email: lookupEmail,
+              code: credentials.code
+            });
+
+            if (!codeRecord) {
+              throw new Error('Invalid or expired verification code');
+            }
+
+            // Verify if expired manually as safety (10 minutes)
+            const isExpired = Date.now() - codeRecord.createdAt.getTime() > 10 * 60 * 1000;
+            if (isExpired) {
+              await VerificationCode.deleteOne({ _id: codeRecord._id });
+              throw new Error('Verification code has expired');
+            }
+
+            // Delete the used code
+            await VerificationCode.deleteOne({ _id: codeRecord._id });
+          }
+
+          return authenticatedUser;
         } catch (error) {
           console.error('Auth: Error during authorize:', error);
           throw error;
         }
-
-        return null;
       }
     })
   ],
