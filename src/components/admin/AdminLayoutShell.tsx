@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   Menu,
   X,
-  Lock
+  Lock,
+  FileUser,
 } from 'lucide-react';
 import { SignOutButton } from '@/src/components/admin/SignOutButton';
 import { useSession } from 'next-auth/react';
@@ -38,6 +39,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
       { name: 'Pages', icon: FileText, href: '/admin/pages' },
       { name: 'Projects', icon: FolderKanban, href: '/admin/projects' },
       ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets' }]),
+      { name: 'Resume', icon: FileUser, href: '/admin/resume' },
       { name: 'Profile Settings', icon: Settings, href: '/admin/settings' },
     ] : []),
   ];

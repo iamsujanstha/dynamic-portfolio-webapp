@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // @react-pdf/renderer is ESM-only — Next.js 14 needs it transpiled.
+  transpilePackages: ['@react-pdf/renderer'],
   // Tell Next.js to use src/ as the root for app/, pages/, and middleware.ts
   // This is required since the project uses the src/ directory layout.
   experimental: {
