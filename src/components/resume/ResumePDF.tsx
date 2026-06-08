@@ -117,7 +117,7 @@ function makeStyles(c: ResumeStyleConfig) {
       alignItems: 'center',
       flexWrap: 'wrap',
       marginBottom: 2,
-      marginTop: 4, // reduced margin to match screenshot
+      marginTop: 10, // reduced margin to match screenshot
     },
     cSep: {
       fontFamily: c.font,
@@ -167,7 +167,8 @@ function makeStyles(c: ResumeStyleConfig) {
     secBotRule: {
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
-      marginBottom: 4,
+      marginBottom: 6,
+      marginTop: 2
     },
 
     // ── Entry ────────────────────────────────────────────────────────────────
@@ -255,7 +256,6 @@ export function ResumePDFDocument({
   function SectionHeading({ title }: { title: string }) {
     return (
       <View style={s.secWrap}>
-        <View style={s.secTopRule} />
         <Text style={s.secTitle}>{title}</Text>
         <View style={s.secBotRule} />
       </View>
@@ -269,9 +269,7 @@ export function ResumePDFDocument({
         {/* ── NAME ── */}
         {styleConfig.nameStyle === 'flanked-rules' ? (
           <View style={s.nameRow}>
-            <View style={s.nameRule} />
             <Text style={s.nameFlanked}>{name}</Text>
-            <View style={s.nameRule} />
           </View>
         ) : (
           <Text style={s.name}>{name}</Text>
