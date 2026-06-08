@@ -4,13 +4,16 @@
 // The data model (ResumeData) is never touched.
 
 export type ResumeFont =
-  | 'Times-Roman'      // Classic serif (current default)
+  | 'Times-Roman'      // Classic serif
   | 'Helvetica'        // Arial / Helvetica — clean sans-serif (ATS-friendly)
-  | 'Courier';         // Monospace / technical
+  | 'Courier'          // Monospace / technical
+  | 'Carlito'          // Calibri equivalent (Google Fonts)
+  | 'RobotoSerif';     // Roboto Serif (Google Fonts)
 
 export interface ResumeStyleConfig {
   // Typography
   font: ResumeFont;
+  nameFont: ResumeFont;          // font used for the name/title (can differ from body)
   baseFontSize: number;       // pt — body text size (8–12)
   lineHeight: number;         // body line-height (1.1–1.8)
   wordSpacing: number;        // extra word spacing in pt (0–4)
@@ -44,26 +47,27 @@ export interface ResumeStyleConfig {
 }
 
 export const DEFAULT_STYLE: ResumeStyleConfig = {
-  font: 'Times-Roman',
-  baseFontSize: 10,
-  lineHeight: 1.28,
-  wordSpacing: 2,
+  font: 'Carlito',
+  nameFont: 'RobotoSerif',
+  baseFontSize: 10.5,
+  lineHeight: 1.3,
+  wordSpacing: 1.5,
 
-  marginH: 35,
+  marginH: 40,
   marginTop: 28,
   marginBottom: 24,
 
   bulletGap: 2,
-  sectionGap: 5,
-  entryGap: 5,
-  contactItemGap: 2,
-  contactBulletGap: 1,
+  sectionGap: 12,
+  entryGap: 8,
+  contactItemGap: 8,
+  contactBulletGap: 3,
 
   ruleWidth: 1,
   ruleColor: '#000000',
 
-  nameFontSize: 22,
-  nameLetterSpacing: 1.2,
+  nameFontSize: 26,
+  nameLetterSpacing: 2,
   nameStyle: 'normal',
 
   linkColor: '#1155CC',
@@ -73,9 +77,20 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
 
 // Maps font key → @react-pdf bold variant
 export const BOLD_FONT: Record<ResumeFont, string> = {
-  'Times-Roman': 'Times-Bold',
-  'Helvetica':   'Helvetica-Bold',
-  'Courier':     'Courier-Bold',
+  'Times-Roman':  'Times-Bold',
+  'Helvetica':    'Helvetica-Bold',
+  'Courier':      'Courier-Bold',
+  'Carlito':      'Carlito-Bold',
+  'RobotoSerif':  'RobotoSerif-Bold',
+};
+
+// Maps font key → @react-pdf italic variant
+export const ITALIC_FONT: Record<ResumeFont, string> = {
+  'Times-Roman':  'Times-Italic',
+  'Helvetica':    'Helvetica-Oblique',
+  'Courier':      'Courier-Oblique',
+  'Carlito':      'Carlito-Italic',
+  'RobotoSerif':  'RobotoSerif-Italic',
 };
 
 export const BULLET_CHARS: Record<ResumeStyleConfig['bulletChar'], string> = {
@@ -87,7 +102,9 @@ export const BULLET_CHARS: Record<ResumeStyleConfig['bulletChar'], string> = {
 };
 
 export const FONT_LABELS: { value: ResumeFont; label: string }[] = [
-  { value: 'Times-Roman', label: 'Times Roman (Serif)' },
-  { value: 'Helvetica',   label: 'Arial / Helvetica (Sans-serif)' },
-  { value: 'Courier',     label: 'Courier (Monospace)' },
+  { value: 'Carlito',      label: 'Carlito / Calibri (Sans-serif)' },
+  { value: 'RobotoSerif',  label: 'Roboto Serif' },
+  { value: 'Times-Roman',  label: 'Times Roman (Serif)' },
+  { value: 'Helvetica',    label: 'Arial / Helvetica (Sans-serif)' },
+  { value: 'Courier',      label: 'Courier (Monospace)' },
 ];
