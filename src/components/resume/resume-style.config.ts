@@ -51,23 +51,23 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
   nameFont: 'RobotoSerif',
   baseFontSize: 10.5,
   lineHeight: 1.3,
-  wordSpacing: 1.5,
+  wordSpacing: 0.3,
 
-  marginH: 40,
-  marginTop: 28,
+  marginH: 16,
+  marginTop: 12,
   marginBottom: 24,
 
   bulletGap: 2,
   sectionGap: 12,
-  entryGap: 8,
+  entryGap: 0,
   contactItemGap: 8,
   contactBulletGap: 3,
 
   ruleWidth: 1,
   ruleColor: '#000000',
 
-  nameFontSize: 26,
-  nameLetterSpacing: 2,
+  nameFontSize: 18,
+  nameLetterSpacing: 1,
   nameStyle: 'normal',
 
   linkColor: '#1155CC',
@@ -77,34 +77,34 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
 
 // Maps font key → @react-pdf bold variant
 export const BOLD_FONT: Record<ResumeFont, string> = {
-  'Times-Roman':  'Times-Bold',
-  'Helvetica':    'Helvetica-Bold',
-  'Courier':      'Courier-Bold',
-  'Carlito':      'Carlito-Bold',
-  'RobotoSerif':  'RobotoSerif-Bold',
+  'Times-Roman': 'Times-Bold',
+  'Helvetica': 'Helvetica-Bold',
+  'Courier': 'Courier-Bold',
+  'Carlito': 'Carlito-Bold',
+  'RobotoSerif': 'RobotoSerif-Bold',
 };
 
 // Maps font key → @react-pdf italic variant
 export const ITALIC_FONT: Record<ResumeFont, string> = {
-  'Times-Roman':  'Times-Italic',
-  'Helvetica':    'Helvetica-Oblique',
-  'Courier':      'Courier-Oblique',
-  'Carlito':      'Carlito-Italic',
-  'RobotoSerif':  'RobotoSerif-Italic',
+  'Times-Roman': 'Times-Italic',
+  'Helvetica': 'Helvetica-Oblique',
+  'Courier': 'Courier-Oblique',
+  'Carlito': 'Carlito-Italic',
+  'RobotoSerif': 'RobotoSerif-Italic',
 };
 
 export const BULLET_CHARS: Record<ResumeStyleConfig['bulletChar'], string> = {
-  'filled-circle':  '\u2022',   // •  (Times at large size renders filled)
-  'hollow-circle':  '\u25E6',   // ◦
-  'dash':           '\u2013',   // –
-  'arrow':          '\u203A',   // ›
-  'square':         '\u25AA',   // ▪
+  'filled-circle': '\u2022',   // •  (Times at large size renders filled)
+  'hollow-circle': '\u25E6',   // ◦
+  'dash': '\u2013',   // –
+  'arrow': '\u203A',   // ›
+  'square': '\u25AA',   // ▪
 };
 
 export const FONT_LABELS: { value: ResumeFont; label: string }[] = [
-  { value: 'Carlito',      label: 'Carlito / Calibri (Sans-serif)' },
-  { value: 'RobotoSerif',  label: 'Roboto Serif' },
-  { value: 'Times-Roman',  label: 'Times Roman (Serif)' },
-  { value: 'Helvetica',    label: 'Arial / Helvetica (Sans-serif)' },
-  { value: 'Courier',      label: 'Courier (Monospace)' },
+  { value: 'Carlito', label: 'Carlito / Calibri (Sans-serif)' },
+  { value: 'RobotoSerif', label: 'Roboto Serif' },
+  { value: 'Times-Roman', label: 'Times Roman (Serif)' },
+  { value: 'Helvetica', label: 'Arial / Helvetica (Sans-serif)' },
+  { value: 'Courier', label: 'Courier (Monospace)' },
 ];

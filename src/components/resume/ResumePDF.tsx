@@ -117,7 +117,7 @@ function makeStyles(c: ResumeStyleConfig) {
       alignItems: 'center',
       flexWrap: 'wrap',
       marginBottom: 2,
-      marginTop: 10, // reduced margin to match screenshot
+      marginTop: 6,
     },
     cSep: {
       fontFamily: c.font,
@@ -141,11 +141,10 @@ function makeStyles(c: ResumeStyleConfig) {
     // ── Summary ────────────────────────────────────────────────────
     summary: {
       fontFamily: c.font, // regular weight (not FI)
-      fontSize: c.baseFontSize + 1,
+      fontSize: c.baseFontSize + 0.5,
       lineHeight: c.lineHeight + 0.07,
       textAlign: 'justify',
       marginTop: 5,
-      marginBottom: 2,
     },
 
     // ── Section heading ──────────────────────────────────────────────────────
@@ -157,18 +156,16 @@ function makeStyles(c: ResumeStyleConfig) {
     },
     secTitle: {
       fontFamily: FB,
-      fontSize: c.baseFontSize + 3,
+      fontSize: c.baseFontSize + 2,
       textAlign: 'center',
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginTop: 2,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     secBotRule: {
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
-      marginBottom: 6,
-      marginTop: 2
+      marginBottom: 6
     },
 
     // ── Entry ────────────────────────────────────────────────────────────────
@@ -180,7 +177,7 @@ function makeStyles(c: ResumeStyleConfig) {
     },
     company: { fontFamily: c.font, fontSize: c.baseFontSize + 1, flex: 1 },
     dates: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, flexShrink: 0, marginLeft: 8 },
-    role: { fontFamily: FB, fontSize: c.baseFontSize + 1, marginTop: 1, marginBottom: 2 },
+    role: { fontFamily: FB, fontSize: c.baseFontSize + 1, marginTop: 1, marginBottom: 6 },
 
     // ── Bullet ───────────────────────────────────────────────────────────────
     bulletRow: {
@@ -264,7 +261,7 @@ export function ResumePDFDocument({
 
   return (
     <Document title={name} author={name} subject="Resume">
-      <Page size="A4" style={s.page}>
+      <Page size="LETTER" style={s.page}>
 
         {/* ── NAME ── */}
         {styleConfig.nameStyle === 'flanked-rules' ? (
@@ -288,15 +285,16 @@ export function ResumePDFDocument({
                   marginLeft: i > 0 ? styleConfig.contactItemGap : 0,
                 }}
               >
-                <Text
-                  style={[
-                    s.cSep,
-                    isLink ? { color: styleConfig.linkColor } : undefined,
-                    { marginRight: styleConfig.contactBulletGap },
-                  ]}
-                >
-                  {'\u2022'}
-                </Text>
+                {i > 0 && (
+                  <Text
+                    style={[
+                      s.cSep,
+                      { marginRight: styleConfig.contactBulletGap },
+                    ]}
+                  >
+                    {'\u2022'}
+                  </Text>
+                )}
                 <Text style={s.cText}>
                   {item.url ? (
                     <Link src={item.url} style={s.cLink}>
@@ -365,7 +363,7 @@ export function ResumePDFDocument({
             {skillGroups.map((sg) => (
               <Text key={sg.id} style={s.skillRow}>
                 <Text style={s.skillBold}>{sg.category}: </Text>
-                <Text style={s.skillPlain}>{sg.skills}</Text>
+                <Text style={s.bulletText}>{sg.skills}</Text>
               </Text>
             ))}
           </>
