@@ -34,13 +34,13 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
   }, [pathname]);
 
   const menuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin', adminOnly: false },
     ...(isVerified ? [
-      { name: 'Pages', icon: FileText, href: '/admin/pages' },
-      { name: 'Projects', icon: FolderKanban, href: '/admin/projects' },
-      ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets' }]),
-      { name: 'Resume', icon: FileUser, href: '/admin/resume' },
-      { name: 'Profile Settings', icon: Settings, href: '/admin/settings' },
+      { name: 'Pages', icon: FileText, href: '/admin/pages', adminOnly: false },
+      { name: 'Projects', icon: FolderKanban, href: '/admin/projects', adminOnly: false },
+      ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets', adminOnly: false }]),
+      { name: 'Resume', icon: FileUser, href: '/admin/resume', adminOnly: false },
+      { name: 'Profile Settings', icon: Settings, href: '/admin/settings', adminOnly: false },
     ] : []),
   ];
 
@@ -89,6 +89,27 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto lg:pt-4 pt-20">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
+            const isDisabled = isViewer && item.adminOnly;
+
+            if (isDisabled) {
+              // Show as a disabled item with lock badge — visible but not clickable
+              return (
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl opacity-40 cursor-not-allowed select-none"
+                  title="Admin access required"
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon size={18} className="text-zinc-600" />
+                    <span className="text-sm font-medium text-zinc-600">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Lock size={11} className="text-zinc-600" />
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.name}
@@ -119,6 +140,19 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
               </p>
             </div>
           )}
+
+          {/* Viewer mode notice */}
+          {/* {isVerified && isViewer && (
+            <div className="mt-4 mx-2 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+              <div className="flex items-center gap-2 text-amber-500 mb-1">
+                <Lock size={11} />
+                <span className="text-[10px] font-black uppercase tracking-widest">Viewer Mode</span>
+              </div>
+              <p className="text-amber-500/50 text-[10px] leading-relaxed">
+                Locked items require admin access.
+              </p>
+            </div>
+          )} */}
         </nav>
 
         <div className="p-4 border-t border-zinc-800">

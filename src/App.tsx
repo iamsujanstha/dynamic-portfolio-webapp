@@ -89,7 +89,7 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
       />
 
       <CustomCursor />
-      <Navbar />
+      <Navbar siteLogo={effectiveData?.settings?.siteLogo} />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
         <Hero

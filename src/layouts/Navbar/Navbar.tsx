@@ -12,7 +12,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export const Navbar = () => {
+export const Navbar = ({ siteLogo }: { siteLogo?: string }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -103,7 +103,18 @@ export const Navbar = () => {
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-sm font-black tracking-tighter text-text-main transition-colors group-hover:text-brand-primary">
-              <Image src="/logo.png" alt="Sujan" width={60} height={60} />
+              <Image
+                src={
+                  siteLogo
+                    ? siteLogo.startsWith('/') || siteLogo.startsWith('http')
+                      ? siteLogo
+                      : `https://${siteLogo}`
+                    : '/logo.png'
+                }
+                alt="Logo"
+                width={60}
+                height={60}
+              />
             </span>
             <span className="text-[9px] font-mono text-text-main/30 tracking-[0.3em] uppercase mt-1">Engineer</span>
           </div>

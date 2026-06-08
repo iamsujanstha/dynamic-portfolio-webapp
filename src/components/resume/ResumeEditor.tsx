@@ -4,8 +4,9 @@ import React, { useState, useCallback, useTransition, useEffect, useRef } from '
 import {
   Plus, Trash2, Download, Save, ChevronDown, ChevronUp,
   User, Briefcase, GraduationCap, Wrench, FileText,
-  Loader2, Eye, RefreshCw, Sliders, RotateCcw, BookmarkCheck,
+  Loader2, Eye, RefreshCw, Sliders, RotateCcw, BookmarkCheck, ShieldAlert,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { DEFAULT_RESUME_DATA } from '@/src/types/resume';
 import type { ResumeData, ResumeExperience, ResumeEducation, ResumeSkillGroup } from '@/src/types/resume';
 import {
@@ -166,6 +167,8 @@ function StylePanel({
   onSetDefault: () => void;
   defaultStatus: 'idle' | 'saved';
 }) {
+  const { data: session } = useSession();
+  const isViewer = (session?.user as any)?.role === 'VIEWER';
   const set = <K extends keyof ResumeStyleConfig>(key: K) =>
     (value: ResumeStyleConfig[K]) => onChange(key, value);
 
@@ -187,7 +190,9 @@ function StylePanel({
               defaultStatus === 'saved'
                 ? 'bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20'
                 : 'bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600/30 hover:border-blue-400'
-            }`}>
+            }`}
+            disabled={isViewer}
+            >
             {defaultStatus === 'saved'
               ? <><BookmarkCheck size={11} /> Saved as Default!</>
               : <><BookmarkCheck size={11} /> Set as Default</>
@@ -308,6 +313,9 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
     if (saved) setStyle(s => ({ ...DEFAULT_STYLE, ...saved }));
     setMounted(true);
   }, []);
+
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role !== 'VIEWER';
 
   const [setDefaultStatus, setSetDefaultStatus] = useState<'idle' | 'saved'>('idle');
 
@@ -430,17 +438,53 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
             <Download size={14} /> Download
           </button>
-          <button type="button" onClick={handleSave} disabled={saveStatus === 'saving' || isPending}
-            className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-              saveStatus === 'saved' ? 'bg-emerald-600 text-white'
-              : saveStatus === 'error' ? 'bg-red-600 text-white'
-              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20'
-            }`}>
-            {saveStatus === 'saving' ? <><Loader2 size={14} className="animate-spin" /> Saving…</>
-             : saveStatus === 'saved' ? <><Save size={14} /> Saved!</>
-             : saveStatus === 'error' ? 'Error — retry'
-             : <><Save size={14} /> Save to Site</>}
-          </button>
+
+          {/* Save to Site — admin only */}
+          <div className="relative group/save">
+            <button
+              type="button"
+              onClick={isAdmin ? handleSave : undefined}
+              disabled={!isAdmin || saveStatus === 'saving' || isPending}
+              className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                !isAdmin
+                  ? 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-not-allowed'
+                  : saveStatus === 'saved' ? 'bg-emerald-600 text-white'
+                  : saveStatus === 'error' ? 'bg-red-600 text-white'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
+            >
+              {!isAdmin ? (
+                <><ShieldAlert size={14} className="text-amber-500" /> Save to Site</>
+              ) : saveStatus === 'saving' ? (
+                <><Loader2 size={14} className="animate-spin" /> Saving…</>
+              ) : saveStatus === 'saved' ? (
+                <><Save size={14} /> Saved!</>
+              ) : saveStatus === 'error' ? (
+                'Error — retry'
+              ) : (
+                <><Save size={14} /> Save to Site</>
+              )}
+            </button>
+
+            {/* Tooltip shown only for non-admins */}
+            {!isAdmin && (
+              <div className="absolute right-0 top-full mt-2 w-56 pointer-events-none opacity-0 group-hover/save:opacity-100 transition-opacity duration-200 z-50">
+                <div className="bg-zinc-900 border border-amber-500/30 rounded-xl p-3 shadow-xl">
+                  <div className="flex items-start gap-2">
+                    <ShieldAlert size={14} className="text-amber-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Admin Only</p>
+                      <p className="text-[10px] text-zinc-400 leading-relaxed">
+                        Saving to the site requires admin access. You can still download the PDF locally.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Arrow */}
+                  <div className="absolute -top-1.5 right-5 w-3 h-3 bg-zinc-900 border-l border-t border-amber-500/30 rotate-45" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

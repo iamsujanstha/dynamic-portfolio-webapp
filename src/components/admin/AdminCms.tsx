@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState, useTransition, useRef } from '
 import type { ReactNode } from 'react';
 import { SimKey } from '@/services/simulationService';
 import { useSimulation } from '@/hooks/useSimulation';
-import { CheckCircle2, FileUp, Plus, Save, Trash2, User, X, ExternalLink } from 'lucide-react';
+import { CheckCircle2, FileUp, Plus, Save, Trash2, User, X, ExternalLink, Image as ImageIcon, FileUser, ShieldCheck } from 'lucide-react';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useSession } from 'next-auth/react';
@@ -958,6 +958,60 @@ function SettingsCms({ initialSettings, onUpdate, isVerified = true }: { initial
           </div>
 
           <div className="grid gap-8">
+            <Field label="Site Logo">
+              <div className="flex items-center gap-4">
+                <div className="relative w-16 h-16 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 flex-shrink-0">
+                  {form.siteLogo ? (
+                    <Image
+                      src={
+                        form.siteLogo.startsWith('/') || form.siteLogo.startsWith('http')
+                          ? form.siteLogo
+                          : `https://${form.siteLogo}`
+                      }
+                      alt="Site Logo"
+                      fill
+                      className="object-contain p-1"
+                      sizes="64px"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-zinc-700">
+                      <ImageIcon size={24} />
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <p className="truncate text-xs font-bold text-zinc-300">
+                    {form.siteLogo ? form.siteLogo.split('/').pop() : 'No logo uploaded'}
+                  </p>
+                  <label className={`cursor-pointer text-[10px] font-black uppercase tracking-widest transition-colors ${isViewer ? 'text-zinc-600 cursor-not-allowed' : 'text-blue-500 hover:text-blue-400'}`}>
+                    {isViewer ? 'Upload Restricted' : 'Upload Logo'}
+                    <input type="file" className="hidden" accept="image/*" disabled={isViewer} onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      startTransition(async () => {
+                        try {
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          formData.append('name', 'Site Logo');
+                          const asset = await request('/api/assets/upload', { method: 'POST', body: formData });
+                          update('siteLogo', asset.url);
+                          setMessage('Logo uploaded. Remember to click Save Settings!');
+                        } catch (err: any) {
+                          setError(err.message);
+                        }
+                      });
+                    }} />
+                  </label>
+                  {form.siteLogo && !isViewer && (
+                    <button type="button" onClick={() => update('siteLogo', '')}
+                      className="text-[10px] font-bold uppercase tracking-widest text-red-500/60 hover:text-red-400 transition-colors text-left">
+                      Remove Logo
+                    </button>
+                  )}
+                </div>
+              </div>
+            </Field>
+
             <Field label="Profile Picture">
               <div className="relative aspect-square max-w-[240px] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 mx-auto sm:mx-0">
                 {form.profilePicture ? (
@@ -1009,6 +1063,27 @@ function SettingsCms({ initialSettings, onUpdate, isVerified = true }: { initial
                 </div>
               </div>
             </Field>
+
+            {/* Edit PDF Resume — admin only */}
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold text-zinc-300 mb-1">PDF Resume Editor</p>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    Open the visual resume builder to edit content, typography, spacing, and regenerate the PDF.
+                  </p>
+                </div>
+                <Link
+                  href={'/admin/resume'}
+                  className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+ 'border-blue-500/40 bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:border-blue-400'
+                  }`}
+                >
+                  <FileUser size={14} />
+                  {'Edit Resume'}
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 

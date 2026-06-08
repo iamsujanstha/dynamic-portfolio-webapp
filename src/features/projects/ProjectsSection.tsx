@@ -80,7 +80,6 @@ export const ProjectsSection = ({ cmsData }: { cmsData?: CMSData['projects'] }) 
             className="flex flex-col gap-6"
           >
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-mono text-brand-primary uppercase tracking-[0.5em] font-black">Archive.02</span>
               <div className="w-20 h-[1px] bg-brand-primary/20" />
             </div>
             <h2 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-text-main uppercase leading-none">
