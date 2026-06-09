@@ -8,6 +8,7 @@ import {
   GripVertical,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { saveResumeAction } from '@/src/app/actions/resume';
 import { DEFAULT_RESUME_DATA } from '@/src/types/resume';
 import type { ResumeData, ResumeExperience, ResumeEducation, ResumeSkillGroup } from '@/src/types/resume';
 import {
@@ -456,14 +457,11 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
         const formData = new FormData();
         formData.append('file', blob, 'resume.pdf');
         formData.append('name', 'Active Resume');
-        const res = await fetch('/api/assets/upload', { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Upload failed');
-        const asset = await res.json();
-        const patchRes = await fetch('/api/settings', {
-          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resumeUrl: asset.url, resumeData: data }),
-        });
-        if (!patchRes.ok) throw new Error('Settings update failed');
+        
+        // Invoke the Server Action to handle upload and settings persistence server-side
+        const result = await saveResumeAction(formData, data);
+        if (!result.success) throw new Error(result.error);
+
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 3000);
       } catch (err) {
