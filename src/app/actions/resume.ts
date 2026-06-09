@@ -9,6 +9,7 @@ import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import dbConnect from '@/lib/db/mongodb';
 import Asset from '@/src/models/Asset';
+import { revalidatePath } from 'next/cache';
 
 const SINGLETON_NAMES = ['Active Resume'];
 
@@ -32,6 +33,10 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
     const isSingleton = SINGLETON_NAMES.includes(assetName);
     let fileUrl: string;
 
+    // Convert file to a raw Node Buffer to bypass Server Action serialization issues on Vercel
+    const arrayBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
+
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       // ── Vercel Blob (production) ──────────────────────────────────────────
       if (isSingleton) {
@@ -43,17 +48,19 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
           await (Asset as any).findByIdAndDelete(prev._id).exec();
         }
         // Use a fixed name so Vercel Blob URL stays predictable (addRandomSuffix: false)
-        const blob = await put(`resume/active-resume.pdf`, file, {
+        const blob = await put(`resume/active-resume.pdf`, fileBuffer, {
           access: 'public',
           addRandomSuffix: false,
           allowOverwrite: true,
+          contentType: file.type || 'application/pdf',
         });
         fileUrl = blob.url;
       } else {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
-        const blob = await put(safeName, file, {
+        const blob = await put(safeName, fileBuffer, {
           access: 'public',
           addRandomSuffix: true,
+          contentType: file.type || 'application/octet-stream',
         });
         fileUrl = blob.url;
       }
@@ -81,15 +88,13 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
           await (Asset as any).findByIdAndDelete(prev._id).exec();
         }
 
-        const arrayBuffer = await file.arrayBuffer();
-        await writeFile(filePath, Buffer.from(arrayBuffer));
+        await writeFile(filePath, fileBuffer);
       } else {
         // Non-singleton: keep timestamped naming
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
         filename = `${Date.now()}-${safeName}`;
         const filePath = path.join(uploadsDir, filename);
-        const arrayBuffer = await file.arrayBuffer();
-        await writeFile(filePath, Buffer.from(arrayBuffer));
+        await writeFile(filePath, fileBuffer);
       }
 
       fileUrl = `/uploads/${filename}`;
@@ -110,6 +115,10 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
       resumeUrl: asset.url,
       resumeData: resumeData,
     });
+
+    // Clear static page data caches to reflect changes immediately in production/Vercel
+    revalidatePath('/admin/resume');
+    revalidatePath('/');
 
     return { success: true, url: asset.url };
   } catch (error: any) {
