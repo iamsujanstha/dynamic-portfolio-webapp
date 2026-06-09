@@ -5,6 +5,7 @@ import '../index.css';
 import { Providers } from './providers';
 import { validateSystemIdentity } from '@/lib/security';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body className={!isVerified ? 'grayscale sepia contrast-125 brightness-75 blur-[1px] cursor-not-allowed selection:bg-red-900 selection:text-white' : ''}>
         <Providers>{children}</Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
