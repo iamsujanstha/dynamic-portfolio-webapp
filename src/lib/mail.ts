@@ -29,7 +29,7 @@ export async function sendVerificationEmail(email: string, code: string) {
     html: `
       <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <div style="background-color: #000; color: #fff; padding: 24px; text-align: center;">
-          <h2 style="margin: 0; font-size: 20px; letter-spacing: 1px; text-transform: uppercase;">Admin Gateway Verification</h2>
+          <h2 style="margin: 0; font-size: 20px; letter-spacing: 1px; text-transform: uppercase;">Portfolio Login Verification</h2>
         </div>
         <div style="padding: 32px; background-color: #ffffff; text-align: center;">
           <p style="margin: 0 0 24px; color: #666; font-size: 16px;">Please use the verification code below to access the Admin Gateway:</p>

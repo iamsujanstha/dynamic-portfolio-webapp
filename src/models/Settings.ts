@@ -8,6 +8,7 @@ export interface ISettings extends Document {
   profileDescription?: string;
   profilePicture?: string; // Reference to Profile Picture URL
   resumeUrl?: string; // Reference to active Resume PDF
+  resumeData?: any; // Structured JSON data of the resume
   socialLinks: {
     github?: string;
     linkedin?: string;
@@ -29,6 +30,7 @@ const SettingsSchema = new Schema<ISettings>({
   profileDescription: String,
   profilePicture: String,
   resumeUrl: String,
+  resumeData: Schema.Types.Mixed,
   socialLinks: {
     github: String,
     linkedin: String,

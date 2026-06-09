@@ -8,13 +8,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const [targetEmail, setTargetEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const handlePreSignIn = async () => {
     setError('');
@@ -25,7 +32,7 @@ export default function SignInPage() {
       const response = await fetch('/api/auth/pre-signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -40,14 +47,33 @@ export default function SignInPage() {
         setTargetEmail(data.email || email);
         setShowVerification(true);
         setLoading(false);
-      } else {
-        // Log in directly if no verification is required
-        await completeSignIn();
+        setResendCooldown(30); // 30 seconds cooldown on initial send
       }
     } catch (err) {
       console.error('SignIn: Pre-signin error:', err);
       setError('A system error occurred.');
       setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return;
+    setError('');
+    setResendCooldown(30);
+    try {
+      const response = await fetch('/api/auth/pre-signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || 'Failed to resend verification code.');
+        setResendCooldown(0);
+      }
+    } catch (err) {
+      setError('Failed to resend verification code.');
+      setResendCooldown(0);
     }
   };
 
@@ -61,21 +87,20 @@ export default function SignInPage() {
     await completeSignIn(code);
   };
 
-  const completeSignIn = async (otpCode?: string) => {
+  const completeSignIn = async (otpCode: string) => {
     try {
       console.log('SignIn: Completing credentials sign in...');
       const res = await signIn('credentials', {
         redirect: false,
         email,
-        password,
-        code: otpCode || '',
+        code: otpCode,
         callbackUrl: '/admin'
       });
 
       console.log('SignIn: Result received:', res);
 
       if (res?.error) {
-        setError(otpCode ? 'Invalid or expired verification code.' : 'Access Denied. Check your credentials.');
+        setError('Invalid or expired verification code.');
         setLoading(false);
       } else {
         console.log('SignIn: Success, redirecting to /admin...');
@@ -187,23 +212,7 @@ export default function SignInPage() {
                         required
                         disabled={loading}
                         className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                        placeholder="tlsujank.co@gmail.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Password</label>
-                    <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-blue-500 transition-colors" size={18} />
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={loading}
-                        className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                        placeholder="password123"
+                        placeholder="your-mail@gmail.com"
                       />
                     </div>
                   </div>
@@ -214,7 +223,7 @@ export default function SignInPage() {
                     className="w-full relative group overflow-hidden bg-white hover:bg-zinc-100 text-black font-black py-4 px-4 rounded-2xl transition-all mt-2 active:scale-[0.98] disabled:opacity-50"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? 'Validating...' : 'Enter System'}
+                      {loading ? 'Sending Code...' : 'Send Login Code'}
                       {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                     </span>
                   </button>
@@ -265,17 +274,27 @@ export default function SignInPage() {
                     </span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowVerification(false);
-                      setCode('');
-                      setError('');
-                    }}
-                    className="w-full text-zinc-500 hover:text-zinc-300 text-xs font-semibold text-center mt-2 transition-colors"
-                  >
-                    Back to Login
-                  </button>
+                  <div className="flex justify-between items-center px-1 text-xs mt-2">
+                    <button
+                      type="button"
+                      onClick={handleResendCode}
+                      disabled={resendCooldown > 0 || loading}
+                      className="text-zinc-400 hover:text-white transition-colors disabled:text-zinc-700 disabled:cursor-not-allowed font-bold uppercase tracking-wider text-[10px]"
+                    >
+                      {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowVerification(false);
+                        setCode('');
+                        setError('');
+                      }}
+                      className="text-zinc-500 hover:text-zinc-300 font-semibold transition-colors"
+                    >
+                      Change Email
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -283,7 +302,7 @@ export default function SignInPage() {
 
           <div className="my-8 flex items-center gap-4">
             <div className="h-[1px] bg-zinc-800/50 flex-1"></div>
-            <span className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.3em]">External Audit</span>
+            <span className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.3em]">OR</span>
             <div className="h-[1px] bg-zinc-800/50 flex-1"></div>
           </div>
 

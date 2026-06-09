@@ -5,6 +5,7 @@ import {
   Plus, Trash2, Download, Save, ChevronDown, ChevronUp,
   User, Briefcase, GraduationCap, Wrench, FileText,
   Loader2, Eye, RefreshCw, Sliders, RotateCcw, BookmarkCheck, ShieldAlert,
+  GripVertical,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { DEFAULT_RESUME_DATA } from '@/src/types/resume';
@@ -327,6 +328,40 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isPending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
+
+  const [draggedBullet, setDraggedBullet] = useState<{ expId: string; index: number } | null>(null);
+  const [dragEnabled, setDragEnabled] = useState(false);
+
+  const handleDragStart = (e: React.DragEvent, expId: string, index: number) => {
+    setDraggedBullet({ expId, index });
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent, expId: string, index: number) => {
+    e.preventDefault();
+    if (!draggedBullet) return;
+    if (draggedBullet.expId !== expId) return;
+    if (draggedBullet.index === index) return;
+
+    setData(d => {
+      const experience = d.experience.map(exp => {
+        if (exp.id !== expId) return exp;
+        const bullets = [...exp.bullets];
+        const draggedItem = bullets[draggedBullet.index];
+        bullets.splice(draggedBullet.index, 1);
+        bullets.splice(index, 0, draggedItem);
+        return { ...exp, bullets };
+      });
+      return { ...d, experience };
+    });
+
+    setDraggedBullet({ expId, index });
+  };
+
+  const handleDragEnd = () => {
+    setDraggedBullet(null);
+  };
   useEffect(() => {
     // Load persisted style from localStorage on first mount
     const saved = loadStyleFromStorage();
@@ -426,7 +461,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
         const asset = await res.json();
         const patchRes = await fetch('/api/settings', {
           method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resumeUrl: asset.url }),
+          body: JSON.stringify({ resumeUrl: asset.url, resumeData: data }),
         });
         if (!patchRes.ok) throw new Error('Settings update failed');
         setSaveStatus('saved');
@@ -583,7 +618,25 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
                       <label className={labelCls}>Bullet Points</label>
                       <div className="space-y-2">
                         {exp.bullets.map((b, bi) => (
-                          <div key={bi} className="flex gap-2 items-start">
+                          <div
+                            key={bi}
+                            draggable={dragEnabled}
+                            onDragStart={e => handleDragStart(e, exp.id, bi)}
+                            onDragOver={e => handleDragOver(e, exp.id, bi)}
+                            onDragEnd={handleDragEnd}
+                            className={`flex gap-2 items-start transition-all duration-150 rounded-lg p-1 -mx-1 border ${
+                              draggedBullet?.expId === exp.id && draggedBullet?.index === bi
+                                ? 'opacity-40 bg-blue-950/20 border-dashed border-blue-500/30'
+                                : 'border-transparent'
+                            }`}
+                          >
+                            <div
+                              onMouseEnter={() => setDragEnabled(true)}
+                              onMouseLeave={() => setDragEnabled(false)}
+                              className="cursor-grab active:cursor-grabbing p-1.5 text-zinc-600 hover:text-zinc-300 rounded hover:bg-zinc-800 shrink-0 mt-1"
+                            >
+                              <GripVertical size={13} />
+                            </div>
                             <textarea className={`${inputCls} resize-none py-1.5 text-xs flex-1`} rows={2} value={b}
                               onChange={e => updateBullet(exp.id, bi, e.target.value)} placeholder="Achievement…" />
                             <button type="button" onClick={() => removeBullet(exp.id, bi)} className="mt-1 p-1 text-zinc-600 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10 shrink-0"><Trash2 size={12} /></button>
