@@ -46,6 +46,7 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
         const blob = await put(`resume/active-resume.pdf`, file, {
           access: 'public',
           addRandomSuffix: false,
+          allowOverwrite: true,
         });
         fileUrl = blob.url;
       } else {

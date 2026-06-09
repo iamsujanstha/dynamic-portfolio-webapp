@@ -42,6 +42,7 @@ export async function POST(req: Request) {
         const blob = await put(`resume/active-resume.pdf`, file, {
           access: 'public',
           addRandomSuffix: false,
+          allowOverwrite: true,
         });
         fileUrl = blob.url;
       } else {
