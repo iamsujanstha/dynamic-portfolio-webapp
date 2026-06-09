@@ -1,10 +1,33 @@
+/**
+ * @module lib/auth
+ * @description NextAuth configuration — defines authentication providers,
+ *              session strategy, and authorization callbacks.
+ *
+ * ┌─────────────────────────────────────────────────────────────┐
+ * │  AUTH FLOW (TOTP)                                          │
+ * │                                                            │
+ * │  1. User enters email on /auth/signin                      │
+ * │  2. pre-signin API checks if email is allowed              │
+ * │  3. User enters 6-digit TOTP code from authenticator app   │
+ * │  4. NextAuth calls authorize() below                       │
+ * │  5. authorize() fetches the encrypted TOTP secret          │
+ * │     • Bootstrap admin → from TOTP_SECRET env var           │
+ * │     • DB user → from user.totpSecret (AES-256-GCM)        │
+ * │  6. Decrypts secret → verifies token via otplib            │
+ * │  7. Returns user object → JWT session created              │
+ * │                                                            │
+ * │  DUAL PROVIDER SUPPORT                                     │
+ * │  • CredentialsProvider: Admin login with email + TOTP      │
+ * │  • GoogleProvider: Guest/viewer login via OAuth             │
+ * └─────────────────────────────────────────────────────────────┘
+ */
+
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/src/lib/db/mongodb';
 import User, { UserRole } from '@/src/models/User';
-import VerificationCode from '@/src/models/VerificationCode';
-import bcrypt from 'bcryptjs';
+import { verifyToken, decryptSecret } from '@/src/lib/totp';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,48 +38,41 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Admin Login',
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "admin@example.com" },
-        code: { label: "Verification Code", type: "text" }
+        email: { label: 'Email', type: 'email', placeholder: 'admin@example.com' },
+        code: { label: 'Authenticator Code', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.code) return null;
+
         try {
           await dbConnect();
-          console.log('Auth: DB connected successfully');
 
-          // Normalize target email for bootstrap admin check
+          // ── Identify the User ─────────────────────────────────
           const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
           const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
 
-          let lookupEmail = credentials.email;
           let isBootstrap = false;
           if (credentials.email === envAdminEmail || credentials.email === envAdminUser) {
             isBootstrap = true;
-            lookupEmail = envAdminEmail;
           }
 
-          // 1. Database Lookup (Primary)
-          const user = await User.findOne({ email: credentials.email });
-          console.log('Auth: User lookup result:', user ? 'User found' : 'User not found');
-
+          // Build the authenticated user object
+          const dbUser = await User.findOne({ email: credentials.email });
           let authenticatedUser = null;
 
-          if (user) {
+          if (dbUser) {
             authenticatedUser = {
-              id: user._id.toString(),
-              name: user.name,
-              email: user.email,
-              role: user.role
+              id: dbUser._id.toString(),
+              name: dbUser.name,
+              email: dbUser.email,
+              role: dbUser.role,
             };
-          }
-
-          // 2. Check for Bootstrap Admin (Fallback)
-          if (!authenticatedUser && isBootstrap) {
+          } else if (isBootstrap) {
             authenticatedUser = {
               id: 'admin-bootstrap',
               name: 'System Admin',
               email: envAdminEmail,
-              role: UserRole.ADMIN
+              role: UserRole.ADMIN,
             };
           }
 
@@ -64,33 +80,32 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          // Find matching code in DB
-          const codeRecord = await VerificationCode.findOne({
-            email: lookupEmail,
-            code: credentials.code
-          });
+          // ── Verify TOTP Token ─────────────────────────────────
+          let secret: string;
 
-          if (!codeRecord) {
-            throw new Error('Invalid or expired verification code');
+          if (isBootstrap) {
+            // Bootstrap admin: plaintext secret from environment
+            secret = process.env.TOTP_SECRET || '';
+          } else {
+            // DB user: fetch encrypted secret and decrypt
+            const userWithSecret = await User.findOne({ email: credentials.email })
+              .select('+totpSecret');
+            secret = userWithSecret?.totpSecret
+              ? decryptSecret(userWithSecret.totpSecret)
+              : '';
           }
 
-          // Verify if expired manually as safety (10 minutes)
-          const isExpired = Date.now() - codeRecord.createdAt.getTime() > 10 * 60 * 1000;
-          if (isExpired) {
-            await VerificationCode.deleteOne({ _id: codeRecord._id });
-            throw new Error('Verification code has expired');
+          if (!secret || !(await verifyToken(credentials.code, secret))) {
+            throw new Error('Invalid authenticator code');
           }
-
-          // Delete the used code
-          await VerificationCode.deleteOne({ _id: codeRecord._id });
 
           return authenticatedUser;
         } catch (error) {
-          console.error('Auth: Error during authorize:', error);
+          console.error('[Auth] Error during authorize:', error);
           throw error;
         }
-      }
-    })
+      },
+    }),
   ],
   session: {
     strategy: 'jwt',
@@ -109,7 +124,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name || profile?.name || 'Google User',
             email: user.email,
             image: user.image,
-            role: UserRole.VIEWER
+            role: UserRole.VIEWER,
           });
         }
 

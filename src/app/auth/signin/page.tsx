@@ -43,11 +43,10 @@ export default function SignInPage() {
         return;
       }
 
-      if (data.requiresVerification) {
+      if (data.requiresTOTP) {
         setTargetEmail(data.email || email);
         setShowVerification(true);
         setLoading(false);
-        setResendCooldown(30); // 30 seconds cooldown on initial send
       }
     } catch (err) {
       console.error('SignIn: Pre-signin error:', err);
@@ -56,26 +55,6 @@ export default function SignInPage() {
     }
   };
 
-  const handleResendCode = async () => {
-    if (resendCooldown > 0) return;
-    setError('');
-    setResendCooldown(30);
-    try {
-      const response = await fetch('/api/auth/pre-signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Failed to resend verification code.');
-        setResendCooldown(0);
-      }
-    } catch (err) {
-      setError('Failed to resend verification code.');
-      setResendCooldown(0);
-    }
-  };
 
   const handleVerifySubmit = async () => {
     if (code.length !== 6) {
@@ -100,7 +79,7 @@ export default function SignInPage() {
       console.log('SignIn: Result received:', res);
 
       if (res?.error) {
-        setError('Invalid or expired verification code.');
+        setError('Invalid authenticator code.');
         setLoading(false);
       } else {
         console.log('SignIn: Success, redirecting to /admin...');
@@ -223,7 +202,7 @@ export default function SignInPage() {
                     className="w-full relative group overflow-hidden bg-white hover:bg-zinc-100 text-black font-black py-4 px-4 rounded-2xl transition-all mt-2 active:scale-[0.98] disabled:opacity-50"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? 'Sending Code...' : 'Send Login Code'}
+                      {loading ? 'Verifying...' : 'Continue'}
                       {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                     </span>
                   </button>
@@ -239,15 +218,15 @@ export default function SignInPage() {
                 >
                   <div className="text-center mb-2">
                     <p className="text-xs text-zinc-400">
-                      We sent a 6-digit verification code to
+                      Enter the 6-digit code from your
                     </p>
                     <p className="text-xs text-blue-400 font-bold mt-1">
-                      {targetEmail}
+                      Authenticator App
                     </p>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Verification Code</label>
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Authenticator Code</label>
                     <div className="relative group">
                       <input
                         type="text"
@@ -277,14 +256,6 @@ export default function SignInPage() {
                   <div className="flex justify-between items-center px-1 text-xs mt-2">
                     <button
                       type="button"
-                      onClick={handleResendCode}
-                      disabled={resendCooldown > 0 || loading}
-                      className="text-zinc-400 hover:text-white transition-colors disabled:text-zinc-700 disabled:cursor-not-allowed font-bold uppercase tracking-wider text-[10px]"
-                    >
-                      {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => {
                         setShowVerification(false);
                         setCode('');
@@ -292,7 +263,7 @@ export default function SignInPage() {
                       }}
                       className="text-zinc-500 hover:text-zinc-300 font-semibold transition-colors"
                     >
-                      Change Email
+                      Back to Email
                     </button>
                   </div>
                 </motion.div>
