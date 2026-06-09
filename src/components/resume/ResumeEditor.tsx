@@ -119,7 +119,7 @@ function PdfPreviewPanel({ data, style }: { data: ResumeData; style: ResumeStyle
     <div className="relative flex-1 min-w-0 rounded-2xl border border-zinc-800 bg-zinc-950 overflow-hidden flex flex-col">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
         <Eye size={14} className="text-blue-400" />
-        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Live Preview — A4</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Live Preview — {style.pageSize || 'LETTER'}</span>
         {isRendering && (
           <span className="ml-2 flex items-center gap-1.5 text-[10px] text-zinc-600 font-mono">
             <RefreshCw size={11} className="animate-spin" /> Rendering…
@@ -131,9 +131,9 @@ function PdfPreviewPanel({ data, style }: { data: ResumeData; style: ResumeStyle
         {blobUrl
           ? <iframe key={blobUrl} src={blobUrl} className="w-full h-full border-0" title="Resume Preview" />
           : <div className="flex flex-col items-center justify-center h-full gap-4 text-zinc-600">
-              <Loader2 size={32} className="animate-spin" />
-              <p className="text-xs font-mono uppercase tracking-widest">Generating preview…</p>
-            </div>
+            <Loader2 size={32} className="animate-spin" />
+            <p className="text-xs font-mono uppercase tracking-widest">Generating preview…</p>
+          </div>
         }
         {isRendering && blobUrl && (
           <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-zinc-900/80 border border-zinc-800 flex items-center justify-center">
@@ -149,7 +149,7 @@ function PdfPreviewPanel({ data, style }: { data: ResumeData; style: ResumeStyle
 const STYLE_STORAGE_KEY = 'resume-style-config-v1';
 
 function saveStyleToStorage(s: ResumeStyleConfig) {
-  try { localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(s)); } catch {}
+  try { localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(s)); } catch { }
 }
 function loadStyleFromStorage(): ResumeStyleConfig | null {
   try {
@@ -181,18 +181,17 @@ function StylePanel({
           <span className="text-[9px] text-zinc-600">Saved settings load automatically next session</span>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={onReset}
+          {/* <button type="button" onClick={onReset}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/5 transition-all">
             <RotateCcw size={11} /> Reset
-          </button>
+          </button> */}
           <button type="button" onClick={onSetDefault}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
-              defaultStatus === 'saved'
-                ? 'bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20'
-                : 'bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600/30 hover:border-blue-400'
-            }`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${defaultStatus === 'saved'
+              ? 'bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20'
+              : 'bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600/30 hover:border-blue-400'
+              }`}
             disabled={isViewer}
-            >
+          >
             {defaultStatus === 'saved'
               ? <><BookmarkCheck size={11} /> Saved as Default!</>
               : <><BookmarkCheck size={11} /> Set as Default</>
@@ -201,31 +200,23 @@ function StylePanel({
         </div>
       </div>
 
-      {/* ── Typography ── */}
+      {/* ── Dropdown Controls (comes first) ─────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Typography</p>
-        <Field label="Font Family">
-          <select className={selectCls} value={style.font} onChange={e => onChange('font', e.target.value as ResumeFont)}>
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Layout & Typography Options</p>
+        <Field label="Page Size">
+          <select className={selectCls} value={style.pageSize || 'LETTER'}
+            onChange={e => onChange('pageSize', e.target.value as 'A4' | 'LETTER')}>
+            <option value="A4">A4</option>
+            <option value="LETTER">US Letter</option>
+          </select>
+        </Field>
+        <Field label="Name Font Family">
+          <select className={selectCls} value={style.nameFont} onChange={e => onChange('nameFont', e.target.value as ResumeFont)}>
             {FONT_LABELS.map(f => (
               <option key={f.value} value={f.value}>{f.label}</option>
             ))}
           </select>
         </Field>
-        <SliderField label="Base Font Size" value={style.baseFontSize} min={8} max={13} step={0.5}
-          onChange={set('baseFontSize')} />
-        <SliderField label="Line Height" value={style.lineHeight} min={1.1} max={1.8} step={0.05} unit="×"
-          onChange={set('lineHeight')} />
-        <SliderField label="Word Spacing" value={style.wordSpacing} min={0} max={4} step={0.5}
-          onChange={set('wordSpacing')} />
-      </div>
-
-      {/* ── Name ── */}
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Name Header</p>
-        <SliderField label="Name Font Size" value={style.nameFontSize} min={16} max={32} step={1}
-          onChange={set('nameFontSize')} />
-        <SliderField label="Letter Spacing" value={style.nameLetterSpacing} min={0} max={4} step={0.2}
-          onChange={set('nameLetterSpacing')} />
         <Field label="Name Style">
           <select className={selectCls} value={style.nameStyle}
             onChange={e => onChange('nameStyle', e.target.value as ResumeStyleConfig['nameStyle'])}>
@@ -233,47 +224,13 @@ function StylePanel({
             <option value="flanked-rules">Flanked by rules ——NAME——</option>
           </select>
         </Field>
-      </div>
-
-      {/* ── Page margins ── */}
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Page Margins</p>
-        <SliderField label="Left & Right Margin" value={style.marginH} min={24} max={72}
-          onChange={set('marginH')} />
-        <div className="grid grid-cols-2 gap-3">
-          <SliderField label="Top Margin" value={style.marginTop} min={10} max={56}
-            onChange={set('marginTop')} />
-          <SliderField label="Bottom Margin" value={style.marginBottom} min={10} max={48}
-            onChange={set('marginBottom')} />
-        </div>
-      </div>
-
-      {/* ── Spacing ── */}
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Spacing</p>
-        <SliderField label="Gap Between Bullets" value={style.bulletGap} min={0} max={8}
-          onChange={set('bulletGap')} />
-        <SliderField label="Gap Between Sections" value={style.sectionGap} min={2} max={16}
-          onChange={set('sectionGap')} />
-        <SliderField label="Gap Between Companies" value={style.entryGap} min={2} max={14}
-          onChange={set('entryGap')} />
-        <SliderField label="Contact Item Gap" value={style.contactItemGap} min={0} max={12} step={0.5}
-          onChange={set('contactItemGap')} />
-        <SliderField label="Bullet → Text Space" value={style.contactBulletGap} min={0} max={6} step={0.5}
-          onChange={set('contactBulletGap')} />
-      </div>
-
-      {/* ── Rules ── */}
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Divider Lines</p>
-        <SliderField label="Line Thickness" value={style.ruleWidth} min={0.25} max={2.5} step={0.25}
-          onChange={set('ruleWidth')} />
-        <ColorField label="Line Color" value={style.ruleColor} onChange={set('ruleColor')} />
-      </div>
-
-      {/* ── Bullets ── */}
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Bullet Style</p>
+        <Field label="Body Font Family">
+          <select className={selectCls} value={style.font} onChange={e => onChange('font', e.target.value as ResumeFont)}>
+            {FONT_LABELS.map(f => (
+              <option key={f.value} value={f.value}>{f.label}</option>
+            ))}
+          </select>
+        </Field>
         <Field label="Bullet Character">
           <select className={selectCls} value={style.bulletChar}
             onChange={e => onChange('bulletChar', e.target.value as ResumeStyleConfig['bulletChar'])}>
@@ -286,7 +243,70 @@ function StylePanel({
         </Field>
       </div>
 
-      {/* ── Colors ── */}
+      {/* ── Name Header Settings ────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Name Header Settings</p>
+        <SliderField label="Name Font Size" value={style.nameFontSize} min={16} max={32} step={1}
+          onChange={set('nameFontSize')} />
+        <SliderField label="Letter Spacing" value={style.nameLetterSpacing} min={0} max={4} step={0.2}
+          onChange={set('nameLetterSpacing')} />
+      </div>
+
+      {/* ── Divider Lines ─────────────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Divider Lines</p>
+        <SliderField label="Line Thickness" value={style.ruleWidth} min={0.25} max={2.5} step={0.25}
+          onChange={set('ruleWidth')} />
+        <ColorField label="Line Color" value={style.ruleColor} onChange={set('ruleColor')} />
+      </div>
+
+      {/* ── Contact Info Spacing ────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Contact Info Spacing</p>
+        <SliderField label="Contact Item Gap" value={style.contactItemGap} min={0} max={12} step={0.5}
+          onChange={set('contactItemGap')} />
+        <SliderField label="Contact Bullet Gap" value={style.contactBulletGap} min={0} max={6} step={0.5}
+          onChange={set('contactBulletGap')} />
+      </div>
+
+      {/* ── Typography (Body) ───────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Typography (Body)</p>
+        <SliderField label="Base Font Size" value={style.baseFontSize} min={8} max={13} step={0.5}
+          onChange={set('baseFontSize')} />
+        <SliderField label="Line Height" value={style.lineHeight} min={1.1} max={1.8} step={0.05} unit="×"
+          onChange={set('lineHeight')} />
+        <SliderField label="Body Letter Spacing" value={style.bodyLetterSpacing} min={-0.5} max={2.0} step={0.05}
+          onChange={set('bodyLetterSpacing')} />
+      </div>
+
+      {/* ── Page Margins ─────────────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Page Margins</p>
+        <SliderField label="Left & Right Margin" value={style.marginH} min={10} max={72}
+          onChange={set('marginH')} />
+        <div className="grid grid-cols-2 gap-3">
+          <SliderField label="Top Margin" value={style.marginTop} min={10} max={56}
+            onChange={set('marginTop')} />
+          <SliderField label="Bottom Margin" value={style.marginBottom} min={10} max={48}
+            onChange={set('marginBottom')} />
+        </div>
+      </div>
+
+      {/* ── Content & Spacing (Lists, Sections) ───────────────────────────────── */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Lists & Section Spacing</p>
+        <SliderField label="List Bullet → Text Space" value={style.bulletTextSpace} min={8} max={24} step={1}
+          onChange={set('bulletTextSpace')} />
+        <SliderField label="Gap Between Bullets" value={style.bulletGap} min={0} max={8}
+          onChange={set('bulletGap')} />
+        <SliderField label="Gap Between Sections" value={style.sectionGap} min={2} max={16}
+          onChange={set('sectionGap')} />
+        <SliderField label="Gap Between Companies" value={style.entryGap} min={2} max={14}
+          onChange={set('entryGap')} />
+      </div>
+
+      {/* ── Colors ──────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Colors</p>
         <ColorField label="Link / Accent Color" value={style.linkColor} onChange={set('linkColor')} />
@@ -429,7 +449,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
           </h1>
           <p className="text-zinc-500 text-sm mt-0.5">Edit content · tweak style · preview live.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button type="button" onClick={() => setShowPreview(p => !p)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 hover:text-white transition-all lg:hidden">
             <Eye size={14} /> {showPreview ? 'Hide' : 'Show'} Preview
@@ -445,13 +465,12 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
               type="button"
               onClick={isAdmin ? handleSave : undefined}
               disabled={!isAdmin || saveStatus === 'saving' || isPending}
-              className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                !isAdmin
-                  ? 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-not-allowed'
-                  : saveStatus === 'saved' ? 'bg-emerald-600 text-white'
+              className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${!isAdmin
+                ? 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-not-allowed'
+                : saveStatus === 'saved' ? 'bg-emerald-600 text-white'
                   : saveStatus === 'error' ? 'bg-red-600 text-white'
-                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed'
-              }`}
+                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
             >
               {!isAdmin ? (
                 <><ShieldAlert size={14} className="text-amber-500" /> Save to Site</>
@@ -492,11 +511,10 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
       <div className="flex gap-1 p-1 bg-zinc-900 rounded-xl border border-zinc-800 mb-4 w-fit">
         {(['content', 'style'] as const).map(tab => (
           <button key={tab} type="button" onClick={() => setActiveTab(tab)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-              activeTab === tab
-                ? 'bg-zinc-700 text-white shadow'
-                : 'text-zinc-500 hover:text-zinc-300'
-            }`}>
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab
+              ? 'bg-zinc-700 text-white shadow'
+              : 'text-zinc-500 hover:text-zinc-300'
+              }`}>
             {tab === 'content' ? <FileText size={13} /> : <Sliders size={13} />}
             {tab === 'content' ? 'Content' : 'Style'}
           </button>
@@ -507,7 +525,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
       <div className="flex gap-6 flex-1 min-h-0">
 
         {/* LEFT — sidebar */}
-        <div className="w-full lg:w-[420px] xl:w-[460px] shrink-0 overflow-y-auto space-y-3 pr-1 pb-8">
+        <div className={`w-full lg:w-[420px] xl:w-[460px] shrink-0 overflow-y-auto space-y-3 pr-1 pb-8 ${showPreview ? 'hidden lg:block' : 'block'}`}>
 
           {/* ── STYLE TAB ── */}
           {activeTab === 'style' && (

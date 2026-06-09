@@ -75,7 +75,6 @@ function makeStyles(c: ResumeStyleConfig) {
       paddingBottom: c.marginBottom,
       paddingHorizontal: c.marginH,
       lineHeight: c.lineHeight,
-      wordSpacing: c.wordSpacing,
     },
 
     // ── Name (normal: just centered) ────────────────────────────────────────
@@ -116,21 +115,22 @@ function makeStyles(c: ResumeStyleConfig) {
       justifyContent: 'center',
       alignItems: 'center',
       flexWrap: 'wrap',
-      marginBottom: 2,
       marginTop: 6,
     },
     cSep: {
       fontFamily: c.font,
       fontSize: c.baseFontSize - 0.5,
       color: '#000000',
+      letterSpacing: c.bodyLetterSpacing,
     },
     // The label text
     cText: {
       fontFamily: c.font,
       fontSize: c.baseFontSize - 0.5,
       color: '#000000',
+      letterSpacing: c.bodyLetterSpacing,
     },
-    cLink: { fontFamily: c.font, fontSize: c.baseFontSize - 0.5, color: c.linkColor, textDecoration: 'underline' },
+    cLink: { fontFamily: c.font, fontSize: c.baseFontSize - 0.5, color: c.linkColor, textDecoration: 'underline', letterSpacing: c.bodyLetterSpacing },
 
     // ── Rule ────────────────────────────────────────────────────────────────
     rule: {
@@ -145,6 +145,7 @@ function makeStyles(c: ResumeStyleConfig) {
       lineHeight: c.lineHeight + 0.07,
       textAlign: 'justify',
       marginTop: 5,
+      letterSpacing: c.bodyLetterSpacing,
     },
 
     // ── Section heading ──────────────────────────────────────────────────────
@@ -159,7 +160,7 @@ function makeStyles(c: ResumeStyleConfig) {
       fontSize: c.baseFontSize + 2,
       textAlign: 'center',
       textTransform: 'uppercase',
-      letterSpacing: 0.6,
+      letterSpacing: 0.6 + c.bodyLetterSpacing,
       marginBottom: 1,
     },
     secBotRule: {
@@ -175,9 +176,9 @@ function makeStyles(c: ResumeStyleConfig) {
       justifyContent: 'space-between',
       alignItems: 'flex-start',
     },
-    company: { fontFamily: c.font, fontSize: c.baseFontSize + 1, flex: 1 },
-    dates: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, flexShrink: 0, marginLeft: 8 },
-    role: { fontFamily: FB, fontSize: c.baseFontSize + 1, marginTop: 1, marginBottom: 6 },
+    company: { fontFamily: c.font, fontSize: c.baseFontSize + 1, flex: 1, letterSpacing: c.bodyLetterSpacing },
+    dates: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, flexShrink: 0, marginLeft: 8, letterSpacing: c.bodyLetterSpacing },
+    role: { fontFamily: FB, fontSize: c.baseFontSize + 1, marginTop: 1, marginBottom: 6, letterSpacing: c.bodyLetterSpacing },
 
     // ── Bullet ───────────────────────────────────────────────────────────────
     bulletRow: {
@@ -188,10 +189,11 @@ function makeStyles(c: ResumeStyleConfig) {
     },
     dot: {
       fontFamily: c.font,
-      fontSize: c.baseFontSize + 4,   // larger so • renders as filled circle
-      lineHeight: 0.88,               // pull oversized glyph up to align with text
-      width: 14,
+      fontSize: c.baseFontSize,
+      lineHeight: c.lineHeight + 0.04,
+      width: c.bulletTextSpace,
       flexShrink: 0,
+      letterSpacing: c.bodyLetterSpacing,
     },
     bulletText: {
       fontFamily: c.font,
@@ -199,21 +201,21 @@ function makeStyles(c: ResumeStyleConfig) {
       lineHeight: c.lineHeight + 0.04,
       flex: 1,
       textAlign: 'justify',
-      wordSpacing: c.wordSpacing,
+      letterSpacing: c.bodyLetterSpacing,
     },
 
     // ── Tech stack ───────────────────────────────────────────────────────────
     techRow: { marginTop: 2, marginBottom: 1 },
-    techBold: { fontFamily: FB, fontSize: c.baseFontSize },
-    techPlain: { fontFamily: c.font, fontSize: c.baseFontSize },
+    techBold: { fontFamily: FB, fontSize: c.baseFontSize, letterSpacing: c.bodyLetterSpacing },
+    techPlain: { fontFamily: c.font, fontSize: c.baseFontSize, letterSpacing: c.bodyLetterSpacing },
 
     // ── Education ────────────────────────────────────────────────────────────
-    eduDegree: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, marginTop: 1 },
+    eduDegree: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, marginTop: 1, letterSpacing: c.bodyLetterSpacing },
 
     // ── Skills ───────────────────────────────────────────────────────────────
     skillRow: { marginBottom: 1.5 },
-    skillBold: { fontFamily: FB, fontSize: c.baseFontSize + 0.5 },
-    skillPlain: { fontFamily: c.font, fontSize: c.baseFontSize + 0.5 },
+    skillBold: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, letterSpacing: c.bodyLetterSpacing },
+    skillPlain: { fontFamily: c.font, fontSize: c.baseFontSize + 0.5, letterSpacing: c.bodyLetterSpacing },
   });
 }
 
@@ -261,12 +263,14 @@ export function ResumePDFDocument({
 
   return (
     <Document title={name} author={name} subject="Resume">
-      <Page size="LETTER" style={s.page}>
+      <Page size={styleConfig.pageSize || 'LETTER'} style={s.page}>
 
         {/* ── NAME ── */}
         {styleConfig.nameStyle === 'flanked-rules' ? (
           <View style={s.nameRow}>
+            <View style={s.nameRule} />
             <Text style={s.nameFlanked}>{name}</Text>
+            <View style={s.nameRule} />
           </View>
         ) : (
           <Text style={s.name}>{name}</Text>

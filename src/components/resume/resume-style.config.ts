@@ -11,12 +11,16 @@ export type ResumeFont =
   | 'RobotoSerif';     // Roboto Serif (Google Fonts)
 
 export interface ResumeStyleConfig {
+  // Page Size
+  pageSize: 'A4' | 'LETTER';
+
   // Typography
   font: ResumeFont;
   nameFont: ResumeFont;          // font used for the name/title (can differ from body)
   baseFontSize: number;       // pt — body text size (8–12)
   lineHeight: number;         // body line-height (1.1–1.8)
-  wordSpacing: number;        // extra word spacing in pt (0–4)
+  bodyLetterSpacing: number;  // letter spacing for all content (except name header)
+  bulletTextSpace: number;    // horizontal space between bullet character and list text (8–24)
 
   // Page
   marginH: number;            // horizontal page padding in pt (24–72)
@@ -47,11 +51,13 @@ export interface ResumeStyleConfig {
 }
 
 export const DEFAULT_STYLE: ResumeStyleConfig = {
+  pageSize: 'LETTER',
   font: 'Carlito',
   nameFont: 'RobotoSerif',
   baseFontSize: 10.5,
   lineHeight: 1.3,
-  wordSpacing: 0.3,
+  bodyLetterSpacing: 0,
+  bulletTextSpace: 14,
 
   marginH: 16,
   marginTop: 12,
