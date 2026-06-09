@@ -187,7 +187,7 @@ export default function SignInPage() {
                         required
                         disabled={loading}
                         className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                        placeholder="Email address"
+                        placeholder="tlsujank.co@gmail.com"
                       />
                     </div>
                   </div>
@@ -203,7 +203,7 @@ export default function SignInPage() {
                         required
                         disabled={loading}
                         className="w-full bg-black/40 border border-zinc-800 text-white rounded-2xl p-3.5 pl-12 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-zinc-700"
-                        placeholder="••••••••"
+                        placeholder="password123"
                       />
                     </div>
                   </div>
