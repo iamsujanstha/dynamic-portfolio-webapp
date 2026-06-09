@@ -64,10 +64,6 @@ function SliderField({
         onChange={e => onChange(parseFloat(e.target.value))}
         className="w-full h-1.5 rounded-full accent-blue-500 cursor-pointer bg-zinc-800"
       />
-      <div className="flex justify-between mt-0.5">
-        <span className="text-[9px] text-zinc-700">{min}</span>
-        <span className="text-[9px] text-zinc-700">{max}</span>
-      </div>
     </div>
   );
 }
@@ -175,7 +171,7 @@ function StylePanel({
     (value: ResumeStyleConfig[K]) => onChange(key, value);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4">
       {/* Actions row */}
       <div className="flex items-center justify-between gap-2 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
         <div className="flex flex-col gap-0.5">
@@ -457,7 +453,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
         const formData = new FormData();
         formData.append('file', blob, 'resume.pdf');
         formData.append('name', 'Active Resume');
-        
+
         // Invoke the Server Action to handle upload and settings persistence server-side
         const result = await saveResumeAction(formData, data);
         if (!result.success) throw new Error(result.error);
@@ -622,11 +618,10 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
                             onDragStart={e => handleDragStart(e, exp.id, bi)}
                             onDragOver={e => handleDragOver(e, exp.id, bi)}
                             onDragEnd={handleDragEnd}
-                            className={`flex gap-2 items-start transition-all duration-150 rounded-lg p-1 -mx-1 border ${
-                              draggedBullet?.expId === exp.id && draggedBullet?.index === bi
-                                ? 'opacity-40 bg-blue-950/20 border-dashed border-blue-500/30'
-                                : 'border-transparent'
-                            }`}
+                            className={`flex gap-2 items-start transition-all duration-150 rounded-lg p-1 -mx-1 border ${draggedBullet?.expId === exp.id && draggedBullet?.index === bi
+                              ? 'opacity-40 bg-blue-950/20 border-dashed border-blue-500/30'
+                              : 'border-transparent'
+                              }`}
                           >
                             <div
                               onMouseEnter={() => setDragEnabled(true)}
@@ -635,7 +630,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
                             >
                               <GripVertical size={13} />
                             </div>
-                            <textarea className={`${inputCls} resize-none py-1.5 text-xs flex-1`} rows={2} value={b}
+                            <textarea className={`${inputCls} resize-none py-1.5 text-xs flex-1`} rows={4} value={b}
                               onChange={e => updateBullet(exp.id, bi, e.target.value)} placeholder="Achievement…" />
                             <button type="button" onClick={() => removeBullet(exp.id, bi)} className="mt-1 p-1 text-zinc-600 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10 shrink-0"><Trash2 size={12} /></button>
                           </div>
@@ -645,7 +640,61 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
                         <Plus size={11} /> Add bullet
                       </button>
                     </div>
-                    <Field label="Tech Stack"><input className={inputCls} value={exp.techStack} onChange={e => updateExp(exp.id, 'techStack', e.target.value)} placeholder="React, TypeScript, …" /></Field>
+                    <div>
+                      <label className={labelCls}>Tech Stack</label>
+                      <div className="w-full flex flex-wrap gap-1.5 p-2 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600/40 transition-all min-h-[38px]">
+                        {(exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : []).map((tag, tagIdx) => (
+                          <span key={tagIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/5 hover:bg-blue-500/20 transition-all">
+                            {tag}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const tags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                const newTags = tags.filter((_, i) => i !== tagIdx);
+                                updateExp(exp.id, 'techStack', newTags.join(', '));
+                              }}
+                              className="text-zinc-500 hover:text-red-400 font-extrabold cursor-pointer transition-colors"
+                            >
+                              &times;
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          type="text"
+                          className="flex-1 min-w-[100px] bg-transparent border-0 p-0 text-xs text-zinc-200 placeholder:text-zinc-700 focus:outline-none focus:ring-0"
+                          placeholder={(exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : []).length === 0 ? "React, TypeScript, Next.js..." : "Add tech..."}
+                          onKeyDown={e => {
+                            if (e.key === ',' || e.key === 'Enter') {
+                              e.preventDefault();
+                              const val = e.currentTarget.value.trim();
+                              if (val) {
+                                const currentTags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                const newItems = val.split(',').map(item => item.trim()).filter(Boolean);
+                                const newTags = [...currentTags, ...newItems];
+                                updateExp(exp.id, 'techStack', newTags.join(', '));
+                              }
+                              e.currentTarget.value = '';
+                            } else if (e.key === 'Backspace' && e.currentTarget.value === '') {
+                              const currentTags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
+                              if (currentTags.length > 0) {
+                                const newTags = currentTags.slice(0, -1);
+                                updateExp(exp.id, 'techStack', newTags.join(', '));
+                              }
+                            }
+                          }}
+                          onBlur={e => {
+                            const val = e.currentTarget.value.trim();
+                            if (val) {
+                              const currentTags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
+                              const newItems = val.split(',').map(item => item.trim()).filter(Boolean);
+                              const newTags = [...currentTags, ...newItems];
+                              updateExp(exp.id, 'techStack', newTags.join(', '));
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
                 <button type="button" onClick={addExp} className="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/5 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
@@ -683,7 +732,61 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <Field label="Category"><input className={inputCls} value={sg.category} onChange={e => updateSkillGroup(sg.id, 'category', e.target.value)} placeholder="Frontend" /></Field>
-                      <Field label="Skills"><input className={inputCls} value={sg.skills} onChange={e => updateSkillGroup(sg.id, 'skills', e.target.value)} placeholder="React, TypeScript, …" /></Field>
+                      <div>
+                        <label className={labelCls}>Skills</label>
+                        <div className="w-full flex flex-wrap gap-1.5 p-2 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600/40 transition-all min-h-[38px]">
+                          {(sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : []).map((tag, tagIdx) => (
+                            <span key={tagIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shadow-purple-500/5 hover:bg-purple-500/20 transition-all">
+                              {tag}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const tags = sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                  const newTags = tags.filter((_, i) => i !== tagIdx);
+                                  updateSkillGroup(sg.id, 'skills', newTags.join(', '));
+                                }}
+                                className="text-zinc-500 hover:text-red-400 font-extrabold cursor-pointer transition-colors"
+                              >
+                                &times;
+                              </button>
+                            </span>
+                          ))}
+                          <input
+                            type="text"
+                            className="flex-1 min-w-[80px] bg-transparent border-0 p-0 text-xs text-zinc-200 placeholder:text-zinc-700 focus:outline-none focus:ring-0"
+                            placeholder={(sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : []).length === 0 ? "React, TypeScript..." : "Add..."}
+                            onKeyDown={e => {
+                              if (e.key === ',' || e.key === 'Enter') {
+                                e.preventDefault();
+                                const val = e.currentTarget.value.trim();
+                                if (val) {
+                                  const currentTags = sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                  const newItems = val.split(',').map(item => item.trim()).filter(Boolean);
+                                  const newTags = [...currentTags, ...newItems];
+                                  updateSkillGroup(sg.id, 'skills', newTags.join(', '));
+                                }
+                                e.currentTarget.value = '';
+                              } else if (e.key === 'Backspace' && e.currentTarget.value === '') {
+                                const currentTags = sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                if (currentTags.length > 0) {
+                                  const newTags = currentTags.slice(0, -1);
+                                  updateSkillGroup(sg.id, 'skills', newTags.join(', '));
+                                }
+                              }
+                            }}
+                            onBlur={e => {
+                              const val = e.currentTarget.value.trim();
+                              if (val) {
+                                const currentTags = sg.skills ? sg.skills.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                const newItems = val.split(',').map(item => item.trim()).filter(Boolean);
+                                const newTags = [...currentTags, ...newItems];
+                                updateSkillGroup(sg.id, 'skills', newTags.join(', '));
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
