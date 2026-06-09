@@ -11,15 +11,25 @@ export async function sendVerificationEmail(email: string, code: string) {
     throw new Error('Email service not configured');
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
+  const transporter = nodemailer.createTransport(
+    smtpHost && smtpHost.includes('gmail')
+      ? {
+          service: 'gmail',
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        }
+      : {
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        }
+  );
 
   const info = await transporter.sendMail({
     from: `"Portfolio System Admin" <${smtpUser}>`,

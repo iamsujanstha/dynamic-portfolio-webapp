@@ -52,7 +52,11 @@ export async function POST(request: Request) {
 
     // Send email
     console.log(`[AUTH] Generated Verification Code for ${targetEmail}: ${code}`);
-    await sendVerificationEmail(targetEmail, code);
+    try {
+      await sendVerificationEmail(targetEmail, code);
+    } catch (emailError) {
+      console.error('SMTP sending error (code is still active):', emailError);
+    }
 
     return NextResponse.json({ success: true, requiresVerification: true, email: targetEmail });
   } catch (error) {
