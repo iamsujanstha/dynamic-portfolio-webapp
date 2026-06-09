@@ -243,7 +243,7 @@ function StylePanel({
 
       {/* ── Name Header Settings ────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Name Header Settings</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Name Header Settings</p>
         <SliderField label="Name Font Size" value={style.nameFontSize} min={16} max={32} step={1}
           onChange={set('nameFontSize')} />
         <SliderField label="Letter Spacing" value={style.nameLetterSpacing} min={0} max={4} step={0.2}
@@ -252,7 +252,7 @@ function StylePanel({
 
       {/* ── Divider Lines ─────────────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Divider Lines</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Divider Lines</p>
         <SliderField label="Line Thickness" value={style.ruleWidth} min={0.25} max={2.5} step={0.25}
           onChange={set('ruleWidth')} />
         <ColorField label="Line Color" value={style.ruleColor} onChange={set('ruleColor')} />
@@ -260,7 +260,7 @@ function StylePanel({
 
       {/* ── Contact Info Spacing ────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Contact Info Spacing</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Contact Info Spacing</p>
         <SliderField label="Contact Item Gap" value={style.contactItemGap} min={0} max={12} step={0.5}
           onChange={set('contactItemGap')} />
         <SliderField label="Contact Bullet Gap" value={style.contactBulletGap} min={0} max={6} step={0.5}
@@ -269,7 +269,7 @@ function StylePanel({
 
       {/* ── Typography (Body) ───────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Typography (Body)</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Typography (Body)</p>
         <SliderField label="Base Font Size" value={style.baseFontSize} min={8} max={13} step={0.5}
           onChange={set('baseFontSize')} />
         <SliderField label="Line Height" value={style.lineHeight} min={1.1} max={1.8} step={0.05} unit="×"
@@ -280,7 +280,7 @@ function StylePanel({
 
       {/* ── Page Margins ─────────────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Page Margins</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Page Margins</p>
         <SliderField label="Left & Right Margin" value={style.marginH} min={10} max={72}
           onChange={set('marginH')} />
         <div className="grid grid-cols-2 gap-3">
@@ -293,7 +293,7 @@ function StylePanel({
 
       {/* ── Content & Spacing (Lists, Sections) ───────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Lists & Section Spacing</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Lists & Section Spacing</p>
         <SliderField label="List Bullet → Text Space" value={style.bulletTextSpace} min={8} max={24} step={1}
           onChange={set('bulletTextSpace')} />
         <SliderField label="Gap Between Bullets" value={style.bulletGap} min={0} max={8}
@@ -306,7 +306,7 @@ function StylePanel({
 
       {/* ── Colors ──────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Colors</p>
+        <p className="text-[12px] font-black uppercase tracking-widest text-zinc-300 border-b border-zinc-800 pb-1">Colors</p>
         <ColorField label="Link / Accent Color" value={style.linkColor} onChange={set('linkColor')} />
       </div>
     </div>
