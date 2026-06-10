@@ -13,7 +13,7 @@ import { revalidatePath } from 'next/cache';
 
 const SINGLETON_NAMES = ['Active Resume'];
 
-export async function saveResumeAction(formData: FormData, resumeData: any) {
+export async function saveResumeAction(formData: FormData, resumeData: any, resumeStyle: any) {
   try {
     // 1. Authorize: must be Admin
     const session = await getServerSession(authOptions);
@@ -115,10 +115,11 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
       tags: formData.get('tags')?.toString().split(',').map(t => t.trim()).filter(Boolean) || [],
     });
 
-    // Update global Settings with new PDF asset URL and JSON data
+    // Update global Settings with new PDF asset URL, JSON data, and JSON style config
     await SettingService.updateSettings({
       resumeUrl: asset.url,
       resumeData: resumeData,
+      resumeStyle: resumeStyle,
     });
 
     // Clear static page data caches to reflect changes immediately in production/Vercel

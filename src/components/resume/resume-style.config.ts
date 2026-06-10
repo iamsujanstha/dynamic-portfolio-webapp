@@ -51,7 +51,7 @@ export interface ResumeStyleConfig {
 }
 
 export const DEFAULT_STYLE: ResumeStyleConfig = {
-  pageSize: 'LETTER',
+  pageSize: 'A4',
   font: 'Carlito',
   nameFont: 'RobotoSerif',
   baseFontSize: 10.5,
@@ -59,17 +59,17 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
   bodyLetterSpacing: 0,
   bulletTextSpace: 14,
 
-  marginH: 16,
-  marginTop: 12,
+  marginH: 30,
+  marginTop: 20,
   marginBottom: 24,
 
   bulletGap: 2,
-  sectionGap: 12,
-  entryGap: 0,
+  sectionGap: 5.5,
+  entryGap: 7,
   contactItemGap: 8,
   contactBulletGap: 3,
 
-  ruleWidth: 1,
+  ruleWidth: 1.5,
   ruleColor: '#000000',
 
   nameFontSize: 18,

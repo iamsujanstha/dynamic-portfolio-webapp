@@ -314,12 +314,15 @@ function StylePanel({
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData> }) {
+export function ResumeEditor({ initialData, initialStyle }: { initialData?: Partial<ResumeData>; initialStyle?: Partial<ResumeStyleConfig> }) {
   const [data, setData] = useState<ResumeData>({
     ...DEFAULT_RESUME_DATA, ...initialData,
     contact: { ...DEFAULT_RESUME_DATA.contact, ...(initialData?.contact ?? {}) },
   });
-  const [style, setStyle] = useState<ResumeStyleConfig>(DEFAULT_STYLE);
+  const [style, setStyle] = useState<ResumeStyleConfig>(() => {
+    if (initialStyle) return { ...DEFAULT_STYLE, ...initialStyle };
+    return DEFAULT_STYLE;
+  });
   const [activeTab, setActiveTab] = useState<'content' | 'style'>('content');
   const [showPreview, setShowPreview] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -360,11 +363,15 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
     setDraggedBullet(null);
   };
   useEffect(() => {
-    // Load persisted style from localStorage on first mount
-    const saved = loadStyleFromStorage();
-    if (saved) setStyle(s => ({ ...DEFAULT_STYLE, ...saved }));
+    // If db style exists, prioritize it. Otherwise, load local storage style.
+    if (initialStyle) {
+      setStyle(s => ({ ...DEFAULT_STYLE, ...initialStyle }));
+    } else {
+      const saved = loadStyleFromStorage();
+      if (saved) setStyle(s => ({ ...DEFAULT_STYLE, ...saved }));
+    }
     setMounted(true);
-  }, []);
+  }, [initialStyle]);
 
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role !== 'VIEWER';
@@ -455,7 +462,7 @@ export function ResumeEditor({ initialData }: { initialData?: Partial<ResumeData
         formData.append('name', 'Active Resume');
 
         // Invoke the Server Action to handle upload and settings persistence server-side
-        const result = await saveResumeAction(formData, data);
+        const result = await saveResumeAction(formData, data, style);
         if (!result.success) throw new Error(result.error);
 
         setSaveStatus('saved');

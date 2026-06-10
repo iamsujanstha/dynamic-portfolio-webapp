@@ -17,10 +17,11 @@ export default async function AdminResumePage() {
 
   const settings = await SettingService.getGlobalSettings();
   const initialData = settings?.resumeData ? JSON.parse(JSON.stringify(settings.resumeData)) : undefined;
+  const initialStyle = settings?.resumeStyle ? JSON.parse(JSON.stringify(settings.resumeStyle)) : undefined;
 
   return (
     <div className="h-full flex flex-col">
-      <ResumeEditor initialData={initialData} />
+      <ResumeEditor initialData={initialData} initialStyle={initialStyle} />
     </div>
   );
 }
