@@ -47,11 +47,11 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
           try { await del(prev.url); } catch { /* ignore if already gone */ }
           await (Asset as any).findByIdAndDelete(prev._id).exec();
         }
-        // Use a fixed name so Vercel Blob URL stays predictable (addRandomSuffix: false)
+        // Use addRandomSuffix: true so the URL changes every time. 
+        // This is crucial to bypass aggressive browser caching of PDFs!
         const blob = await put(`resume/active-resume.pdf`, fileBuffer, {
           access: 'public',
-          addRandomSuffix: false,
-          allowOverwrite: true,
+          addRandomSuffix: true,
           contentType: file.type || 'application/pdf',
         });
         fileUrl = blob.url;
@@ -97,7 +97,12 @@ export async function saveResumeAction(formData: FormData, resumeData: any) {
         await writeFile(filePath, fileBuffer);
       }
 
-      fileUrl = `/uploads/${filename}`;
+      if (isSingleton) {
+        // Append a cache-busting timestamp parameter to the URL
+        fileUrl = `/uploads/${filename}?v=${Date.now()}`;
+      } else {
+        fileUrl = `/uploads/${filename}`;
+      }
     }
 
     // Register asset in DB
