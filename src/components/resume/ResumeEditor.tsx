@@ -490,10 +490,44 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 hover:text-white transition-all lg:hidden">
             <Eye size={14} /> {showPreview ? 'Hide' : 'Show'} Preview
           </button>
-          <button type="button" onClick={handleDownload}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all">
-            <Download size={14} /> Download
-          </button>
+          {/* Download — admin only */}
+          <div className="relative group/download">
+            <button
+              type="button"
+              onClick={isAdmin ? handleDownload : undefined}
+              disabled={!isAdmin}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${!isAdmin
+                ? 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-not-allowed'
+                : 'border border-zinc-700 text-zinc-300 hover:bg-zinc-800'
+                }`}
+            >
+              {!isAdmin ? (
+                <><ShieldAlert size={14} className="text-amber-500" /> Download</>
+              ) : (
+                <><Download size={14} /> Download</>
+              )}
+            </button>
+
+            {/* Tooltip shown only for non-admins */}
+            {!isAdmin && (
+              <div className="absolute right-0 top-full mt-2 w-56 pointer-events-none opacity-0 group-hover/download:opacity-100 transition-opacity duration-200 z-50">
+                <div className="bg-zinc-900 border border-amber-500/30 rounded-xl p-3 shadow-xl">
+                  <div className="flex items-start gap-2">
+                    <ShieldAlert size={14} className="text-amber-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Admin Only</p>
+                      <p className="text-[10px] text-zinc-400 leading-relaxed">
+                        Downloading the resume requires admin access.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Arrow */}
+                  <div className="absolute -top-1.5 right-5 w-3 h-3 bg-zinc-900 border-l border-t border-amber-500/30 rotate-45" />
+                </div>
+              </div>
+            )}
+          </div>
+
 
           {/* Save to Site — admin only */}
           <div className="relative group/save">
