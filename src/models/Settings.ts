@@ -10,6 +10,7 @@ export interface ISettings extends Document {
   resumeUrl?: string; // Reference to active Resume PDF
   resumeData?: any; // Structured JSON data of the resume
   resumeStyle?: any; // Structured style options of the resume
+  skills?: string[]; // Dynamic expertise tags list
   socialLinks: {
     github?: string;
     linkedin?: string;
@@ -33,6 +34,7 @@ const SettingsSchema = new Schema<ISettings>({
   resumeUrl: String,
   resumeData: Schema.Types.Mixed,
   resumeStyle: Schema.Types.Mixed,
+  skills: [String],
   socialLinks: {
     github: String,
     linkedin: String,

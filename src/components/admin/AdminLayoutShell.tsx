@@ -36,7 +36,6 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin', adminOnly: false },
     ...(isVerified ? [
-      { name: 'Pages', icon: FileText, href: '/admin/pages', adminOnly: false },
       { name: 'Projects', icon: FolderKanban, href: '/admin/projects', adminOnly: false },
       ...(isViewer ? [] : [{ name: 'Assets', icon: ImageIcon, href: '/admin/assets', adminOnly: false }]),
       { name: 'Resume', icon: FileUser, href: '/admin/resume', adminOnly: false },
@@ -161,7 +160,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A] pt-16 lg:pt-0 flex flex-col">
+      <main className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-[#0A0A0A] to-[#0A0A0A] pt-16 lg:pt-0 flex flex-col">
         <div className="p-6 lg:p-10 max-w-7xl mx-auto w-full flex flex-col flex-1 min-h-0">
           {children}
         </div>

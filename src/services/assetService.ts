@@ -20,7 +20,27 @@ export class AssetService {
 
   static async deleteAsset(id: string) {
     await dbConnect();
-    // Logic to actually remove the file from S3 should be added here
+    const asset = await (Asset as any).findById(id).exec();
+    if (asset && asset.url) {
+      const url = asset.url;
+      if (url.startsWith('/uploads/')) {
+        try {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const filePath = path.join(process.cwd(), 'public', url);
+          await fs.unlink(filePath);
+        } catch (err) {
+          console.error(`Failed to delete local asset file at ${url}:`, err);
+        }
+      } else if (url.startsWith('http')) {
+        try {
+          const { del } = await import('@vercel/blob');
+          await del(url);
+        } catch (err) {
+          console.error(`Failed to delete Vercel Blob at ${url}:`, err);
+        }
+      }
+    }
     return (Asset as any).findByIdAndDelete(id).exec();
   }
 }

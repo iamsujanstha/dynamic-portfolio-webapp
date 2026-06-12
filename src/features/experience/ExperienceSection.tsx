@@ -10,15 +10,58 @@ import { GraduationCap, Briefcase } from 'lucide-react';
 
 import { CMSData } from '@/src/app/page';
 
-export const ExperienceSection = ({ cmsData }: { cmsData?: CMSData['experience'] }) => {
-  const experiencesData = cmsData?.content?.experiences || cmsData?.content?.experience;
-  const displayExperiences = experiencesData?.length
-    ? experiencesData
-    : EXPERIENCE;
+interface ExperienceSectionProps {
+  cmsData?: CMSData['experience'];
+  resumeData?: any;
+}
 
-  const displayEducation = cmsData?.content?.education?.length
-    ? cmsData.content.education
-    : EDUCATION;
+export const ExperienceSection = ({ cmsData, resumeData }: ExperienceSectionProps) => {
+  const experiencesData = cmsData?.content?.experiences || cmsData?.content?.experience;
+
+  const displayExperiences = resumeData?.experience?.length
+    ? resumeData.experience.map((exp: any) => ({
+      id: exp.id,
+      role: exp.role,
+      company: exp.company,
+      period: `${exp.startDate} - ${exp.endDate}`,
+      description: exp.bullets || []
+    }))
+    : (experiencesData?.length ? experiencesData : EXPERIENCE);
+
+  const baseEducation = resumeData?.education?.length
+    ? resumeData.education.map((edu: any) => ({
+      id: edu.id,
+      degree: edu.degree,
+      institution: edu.institution,
+      period: `${edu.startDate} - ${edu.endDate}`
+    }))
+    : (cmsData?.content?.education?.length ? cmsData.content.education : EDUCATION);
+
+  const displayEducation = [
+    ...baseEducation.filter((edu: any) => !(edu.degree?.includes('+2') || edu.id === 'plus-two-static' || edu.id === '2')),
+    {
+      id: 'plus-two-static',
+      degree: 'Computer Science (+2)',
+      institution: 'Shree Jain Vidyalaya, Kolkata, India',
+      period: '2012 - 2014'
+    }
+  ];
+
+  // Calculate total experience dynamically from April 2019 to present date
+  const calculateYOE = () => {
+    const startDate = new Date('2019-04-01');
+    const today = new Date();
+    let years = today.getFullYear() - startDate.getFullYear();
+    let months = today.getMonth() - startDate.getMonth();
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    const totalYears = years + (months / 12);
+    return `${totalYears.toFixed(0)}+`;
+  };
 
   return (
     <section id="experience" className="py-32 px-6 md:px-12">
@@ -31,7 +74,7 @@ export const ExperienceSection = ({ cmsData }: { cmsData?: CMSData['experience']
             transition={{ duration: 0.8 }}
             className="lg:col-span-5"
           >
-            <h2 className="text-4xl md:text-6xl font-display font-bold mb-8 italic text-text-main">{cmsData?.title || 'CURRICULUM'}</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold mb-8 italic text-text-main">{cmsData?.title || 'EXPERIENCE'}</h2>
             <p className="text-text-main/40 mb-12 font-light leading-relaxed">
               {cmsData?.subtitle ? (
                 <span dangerouslySetInnerHTML={{ __html: cmsData.subtitle }} />
@@ -48,7 +91,7 @@ export const ExperienceSection = ({ cmsData }: { cmsData?: CMSData['experience']
             >
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
               <h4 className="text-sm uppercase tracking-widest text-brand-primary font-bold mb-2">Total Experience</h4>
-              <div className="text-6xl font-display font-bold mb-4 text-text-main">{cmsData?.content?.yoe || '6+'}</div>
+              <div className="text-6xl font-display font-bold mb-4 text-text-main">{calculateYOE()}</div>
               <p className="text-text-main/50 italic font-display">{cmsData?.content?.yoeSubtitle || 'Years of professional experience in full stack development.'}</p>
             </motion.div>
 

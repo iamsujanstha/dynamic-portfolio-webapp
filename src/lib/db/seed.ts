@@ -58,7 +58,7 @@ export async function seedDatabase() {
   const experienceSection = await Section.create({
     type: SectionType.EXPERIENCE_TIMELINE,
     status: 'published',
-    title: 'CURRICULUM',
+    title: 'EXPERIENCE',
     content: {
       experiences: [
         {
@@ -100,12 +100,6 @@ export async function seedDatabase() {
           degree: 'Bachelor of Engineering in Computer',
           institution: 'Anna University, Chennai, India',
           period: '2014 - 2018'
-        },
-        {
-          id: '2',
-          degree: 'Computer Science (+2)',
-          institution: 'Shree Jain Vidyalaya, Kolkata, India',
-          period: '2012 - 2014'
         }
       ]
     },
@@ -125,30 +119,7 @@ export async function seedDatabase() {
   });
 
   // 4. Create a Sample Project
-  await Project.create({
-    title: 'AI ARCHITECT',
-    slug: 'ai-architect',
-    description: 'An advanced AI-powered architectural visualization tool that generates optimized floor plans and photorealistic renders from simple text descriptions.',
-    thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1632&auto=format&fit=crop',
-    tags: ['Ollama', 'FastAPI', 'React', 'Qdrant'],
-    featured: true,
-  },
-    {
-      title: 'Random Team Generator',
-      slug: 'random-team-generator',
-      description: 'A smart team generator web app that lets users create random or balanced teams from a custom list of names. Features intelligent balancing based on skill or performance ratings.',
-      thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470&auto=format&fit=crop',
-      tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'OpenAI'],
-      featured: true,
-    },
-    {
-      title: 'OpenLayers Map',
-      slug: 'openlayers-map',
-      description: 'An interactive map application using OpenLayers that allows users to view, manage, and interact with geospatial data visually with advanced layer management.',
-      thumbnail: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1450&auto=format&fit=crop',
-      tags: ['React', 'OpenLayers', 'Styled Components'],
-      featured: true,
-    },
+  await Project.create([
     {
       title: 'Giphy Search',
       slug: 'giphy-search',
@@ -158,14 +129,50 @@ export async function seedDatabase() {
       featured: true,
     },
     {
-      title: 'Portfolio Architecture',
+      title: 'Dynamic Portfolio',
       slug: 'portfolio-architecture',
-      description: 'A personal portfolio website built with React and Framer Motion to showcase web development projects and skills with a focus on motion design.',
+      description: 'A dyanmic portfolio website that has cms to manage the content of the page.',
       thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
-      tags: ['React', 'Framer Motion', 'Tailwind CSS', 'Vite'],
+      tags: ['Next JS', 'Taiwind CSS', 'MongoDB', 'Framer Motion'],
       featured: true,
+      links: {
+        github: 'https://github.com/iamsujanstha/portfolio-website',
+        live: 'https://sujankshrestha.com.np'
+      }
+    },
+    {
+      title: 'Random Team Generator',
+      slug: 'random-team-generator',
+      description: 'A smart team generator web app that lets users create random or balanced teams from a custom list of names. Features intelligent balancing based on skill or performance ratings.',
+      thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470&auto=format&fit=crop',
+      tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'OpenAI'],
+      featured: true,
+    },
+    {
+      title: 'AI Architect',
+      slug: 'ai-architect',
+      description: 'An advanced AI-powered architectural visualization tool that generates optimized floor plans and photorealistic renders from simple text descriptions.',
+      thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1632&auto=format&fit=crop',
+      tags: ['Ollama', 'FastAPI', 'React', 'Qdrant'],
+      featured: true,
+      links: {
+        github: '',
+        live: ''
+      }
+    },
+    {
+      title: 'HyperCurl',
+      slug: 'hypercurl',
+      description: 'An advanced, real-time API performance, resilience, and security test-suite platform. Engineered using a high-throughput multi-threaded client model in React 18, Vite, and Express, designed with a focus on visual feedback, aesthetic typography, and responsive controls.',
+      thumbnail: 'sujankshrestha.com.np',
+      tags: ['React', 'Curl', 'Express'],
+      links: {
+        github: 'https://github.com/iamsujanstha/hypercurl',
+        live: 'https://sujankshrestha.com.np'
+      },
+      featured: false,
     }
-  );
+  ]);
 
   // 5. Create Navigation
   await Navigation.create({
@@ -179,12 +186,137 @@ export async function seedDatabase() {
 
   // 6. Global Settings
   await Settings.create({
-    siteName: 'Sujan.dev',
+    siteName: 'dynamic-portfolio',
+    skills: [
+      'JavaScript / TypeScript',
+      'React / Next.js',
+      'Node.js / NestJS',
+      'Tailwind CSS',
+      'GraphQL / SQL',
+      'Docker / CI/CD',
+      'Jest / Cypress',
+      'Redux / Saga / Toolkit',
+      'Storybook',
+      'Web Accessibility (WCAG)',
+      'Python / FastAPI'
+    ],
     socialLinks: {
-      github: 'https://github.com/sujan',
+      github: 'https://github.com/iamsujanstha',
       linkedin: 'https://linkedin.com/in/sujan',
+      twitter: '',
     },
-    contactEmail: 'hello@sujan.dev',
+    contactEmail: 'tlsujank.co@gmail.com',
+    maintenanceMode: false,
+    primaryColor: '#2563eb',
+    profilePicture: 'https://ofxcobx7gdxssrn7.public.blob.vercel-storage.com/profile-PwGmcND0dDfBzcBzJXh6NxFX4YKXtj.jpg',
+    contactNumber: '9806545497',
+    location: 'Tanahun, Gandaki, Nepal',
+    resumeUrl: 'https://ofxcobx7gdxssrn7.public.blob.vercel-storage.com/resume/active-resume-VO0Cud8amhvlVRNDfajgxDkbMRA742.pdf',
+    resumeData: {
+      name: 'SUJAN SHRESTHA',
+      summary: 'An experienced Frontend Engineer with a strong passion for learning, researching and building web applications that provides a great user experience.',
+      contact: {
+        phone: '+977 9806545497',
+        location: 'Tanahun, Gandaki',
+        email: 'tlsujank.co@gmail.com',
+        portfolioLabel: 'Portfolio',
+        githubLabel: 'GitHub',
+        linkedinLabel: 'LinkedIn',
+        portfolioUrl: 'https://sujankshrestha.com.np',
+        githubUrl: 'https://github.com/iamsujanstha',
+        linkedinUrl: 'https://linkedin.com/in/tlsujank'
+      },
+      experience: [
+        {
+          id: '1',
+          company: 'Infodevelopers Pvt. Ltd.',
+          startDate: '09/2023',
+          endDate: 'Present',
+          role: 'Senior Software Engineer',
+          bullets: [
+            'Modernized a legacy application by introducing modular architecture and reusable domain-driven components following SOLID principles, reducing technical debt, accelerating feature delivery, and improving long-term maintainability.',
+            'Enhanced accessibility and cross-device usability by upgrading legacy systems with responsive design, keyboard navigation, and WCAG compliance, reducing accessibility-related support tickets by 35% and enabling clients to serve a broader audience.',
+            'Redesigned file-management workflows using NestJS, Amazon S3 pre-signed URLs, and event-driven AWS Lambda processing, reducing backend bandwidth consumption, simplifying storage operations, and improving scalability for high-volume uploads.',
+            'Improved Core Web Vitals by reducing Largest Contentful Paint (LCP) from 2.78s to 1.95s and Cumulative Layout Shift (CLS) from 0.21 to 0.09, contributing to improved search visibility and user engagement.',
+            'Improved release reliability by enhancing CI/CD pipelines and deployment workflows, reducing manual deployment effort and enabling faster, more predictable software releases.',
+            'Migrated GraphQL queries from inline .gql usage to .graphql file-based structure, introducing cursor pagination and persisted queries, improving API performance, maintainability, and query consistency.'
+          ],
+          techStack: 'React, GraphQL, Redux, Material UI, Nextjs, Nest, MongoDB, Apollo client, AWS-S3, Lambda'
+        },
+        {
+          id: '2',
+          company: 'Aerion Technologies',
+          startDate: '04/2019',
+          endDate: '09/2023',
+          role: 'Software Developer',
+          bullets: [
+            'Delivered multiple client projects end-to-end, working closely with cross-functional teams to transform business requirements into maintainable and scalable software solutions.',
+            'Explored and implemented authentication strategies using NestJS, including JWT-based authentication and TOTP-based two-factor authentication, improving application security for sensitive user actions and strengthening overall access control design.',
+            'Built server-side rendered applications using Next.js, evaluating different rendering, caching, and data-fetching approaches to improve performance and reduce page load times by ~25%.',
+            'Researched and integrated third-party services such as Zendesk and Recommbee by analysing API documentation and adapting integration strategies to improve support workflows and user personalisation.',
+            'Worked closely with designers to translate Figma designs into responsive and accessible interfaces, iterating based on feedback to improve usability and user experience.',
+            'Designed and implemented backend services using NestJS, building REST APIs, validation layers, and core business workflows to support frontend applications and ensure reliable and consistent data flow.'
+          ],
+          techStack: 'React, SCSS, Styled Components, Redux-toolkit, Storybook, Rest API, Express JS, VueJS'
+        }
+      ],
+      education: [
+        {
+          id: '1',
+          institution: 'Anna University',
+          location: 'Chennai, India',
+          startDate: '2014',
+          endDate: '2018',
+          degree: 'Bachelor of Engineering in Computer'
+        }
+      ],
+      skillGroups: [
+        {
+          id: '1',
+          category: 'Frontend',
+          skills: 'React, Next, TypeScript, Redux, Tailwind, Material UI, Storybook, SCSS'
+        },
+        {
+          id: '2',
+          category: 'Backend',
+          skills: 'Node.js, NestJS, REST APIs, GraphQL, MongoDB'
+        },
+        {
+          id: '3',
+          category: 'DevOps/Tools',
+          skills: 'Docker, Git, CI/CD, AWS-S3, EC2, Terraform, K8S'
+        },
+        {
+          id: '4',
+          category: 'Practices',
+          skills: 'Web Accessibility (WCAG), DSA, Agile/Scrum, System Design fundamentals, Webpack, Rollup'
+        }
+      ]
+    },
+    resumeStyle: {
+      pageSize: 'A4',
+      font: 'Carlito',
+      nameFont: 'RobotoSerif',
+      baseFontSize: 10.5,
+      lineHeight: 1.3,
+      bodyLetterSpacing: 0,
+      bulletTextSpace: 14,
+      marginH: 30,
+      marginTop: 20,
+      marginBottom: 24,
+      bulletGap: 2,
+      sectionGap: 5.5,
+      entryGap: 7,
+      contactItemGap: 8,
+      contactBulletGap: 3,
+      ruleWidth: 1.5,
+      ruleColor: '#000000',
+      nameFontSize: 18,
+      nameLetterSpacing: 1,
+      nameStyle: 'normal',
+      linkColor: '#1155CC',
+      bulletChar: 'filled-circle'
+    }
   });
 
   return { success: true, message: 'Database seeded successfully!' };

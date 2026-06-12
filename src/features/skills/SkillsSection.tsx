@@ -37,10 +37,30 @@ const IconMap: Record<string, any> = {
 
 import { CMSData } from '@/src/app/page';
 
-export const SkillsSection = ({ cmsData }: { cmsData?: CMSData['skills'] }) => {
-  const displaySkills = cmsData?.content?.skills?.map((s: any) => {
+export const SkillsSection = ({ cmsData, settingsSkills }: { cmsData?: CMSData['skills'], settingsSkills?: string[] }) => {
+  const skillsSource = settingsSkills?.length ? settingsSkills : cmsData?.content?.skills;
+
+  const displaySkills = skillsSource?.map((s: any) => {
     if (typeof s === 'string') {
-      return { name: s, category: 'skill', icon: 'Terminal' };
+      const lower = s.toLowerCase();
+      let category = 'skill';
+      let icon = 'Terminal';
+
+      if (lower.includes('react') || lower.includes('next') || lower.includes('typescript') || lower.includes('javascript') || lower.includes('tailwind') || lower.includes('redux') || lower.includes('css') || lower.includes('html') || lower.includes('frontend')) {
+        category = 'frontend';
+      } else if (lower.includes('node') || lower.includes('nest') || lower.includes('express') || lower.includes('graphql') || lower.includes('sql') || lower.includes('mongo') || lower.includes('python') || lower.includes('backend') || lower.includes('api')) {
+        category = 'backend';
+      } else if (lower.includes('docker') || lower.includes('ci/cd') || lower.includes('git') || lower.includes('aws') || lower.includes('jest') || lower.includes('cypress') || lower.includes('storybook') || lower.includes('webpack') || lower.includes('accessibility') || lower.includes('tools')) {
+        category = 'tools';
+      }
+
+      const matchedDefault = SKILLS.find(defSkill => defSkill.name.toLowerCase().includes(lower) || lower.includes(defSkill.name.toLowerCase()));
+      if (matchedDefault) {
+        icon = matchedDefault.icon;
+        category = matchedDefault.category;
+      }
+
+      return { name: s, category, icon };
     }
     return {
       name: s.name || 'Unknown',

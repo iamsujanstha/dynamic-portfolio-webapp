@@ -103,8 +103,8 @@ export default function App({ cmsData }: { cmsData?: CMSData }) {
           linkedinUrl={effectiveData?.settings?.linkedin}
         />
         <Projects cmsData={effectiveData?.projects} />
-        <Skills cmsData={effectiveData?.skills} />
-        <Experience cmsData={effectiveData?.experience} />
+        <Skills cmsData={effectiveData?.skills} settingsSkills={effectiveData?.settings?.skills} />
+        <Experience cmsData={effectiveData?.experience} resumeData={effectiveData?.settings?.resumeData} />
         <Contact
           settings={{
             location: effectiveData?.settings?.location,

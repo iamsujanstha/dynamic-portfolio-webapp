@@ -5,7 +5,7 @@ import {
   Plus, Trash2, Download, Save, ChevronDown, ChevronUp,
   User, Briefcase, GraduationCap, Wrench, FileText,
   Loader2, Eye, RefreshCw, Sliders, RotateCcw, BookmarkCheck, ShieldAlert,
-  GripVertical,
+  GripVertical, FileUp, CheckCircle2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { saveResumeAction } from '@/src/app/actions/resume';
@@ -123,11 +123,10 @@ function PdfPreviewPanel({ data, style }: { data: ResumeData; style: ResumeStyle
             <RefreshCw size={11} className="animate-spin" /> Rendering…
           </span>
         )}
-        <span className="ml-auto text-[10px] text-zinc-600 font-mono">Updates after typing stops</span>
       </div>
       <div className="flex-1 relative">
         {blobUrl
-          ? <iframe key={blobUrl} src={blobUrl} className="w-full h-full border-0" title="Resume Preview" />
+          ? <iframe key={blobUrl} src={`${blobUrl}#toolbar=0`} className="w-full h-full border-0" title="Resume Preview" />
           : <div className="flex flex-col items-center justify-center h-full gap-4 text-zinc-600">
             <Loader2 size={32} className="animate-spin" />
             <p className="text-xs font-mono uppercase tracking-widest">Generating preview…</p>
@@ -172,32 +171,6 @@ function StylePanel({
 
   return (
     <div className="space-y-5 px-4">
-      {/* Actions row */}
-      <div className="flex items-center justify-between gap-2 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Style Defaults</span>
-          <span className="text-[9px] text-zinc-600">Saved settings load automatically next session</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* <button type="button" onClick={onReset}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/5 transition-all">
-            <RotateCcw size={11} /> Reset
-          </button> */}
-          <button type="button" onClick={onSetDefault}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${defaultStatus === 'saved'
-              ? 'bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20'
-              : 'bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600/30 hover:border-blue-400'
-              }`}
-            disabled={isViewer}
-          >
-            {defaultStatus === 'saved'
-              ? <><BookmarkCheck size={11} /> Saved as Default!</>
-              : <><BookmarkCheck size={11} /> Set as Default</>
-            }
-          </button>
-        </div>
-      </div>
-
       {/* ── Dropdown Controls (comes first) ─────────────────────────────────── */}
       <div className="space-y-3">
         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-zinc-800 pb-1">Layout & Typography Options</p>
@@ -378,6 +351,9 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
   const isAdmin = (session?.user as any)?.role !== 'VIEWER';
 
   const [setDefaultStatus, setSetDefaultStatus] = useState<'idle' | 'saved'>('idle');
+  const [assetModalOpen, setAssetModalOpen] = useState(false);
+  const [assetFileName, setAssetFileName] = useState('');
+  const [assetSaveStatus, setAssetSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   function handleSetDefault() {
     saveStyleToStorage(style);
@@ -476,6 +452,41 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
     });
   }
 
+  // ── Save to assets ────────────────────────────────────────────────────────
+  async function executeSaveToAssets() {
+    const finalName = assetFileName.trim() || `${data.name.trim() || 'My'}_Resume`;
+    setAssetSaveStatus('saving');
+
+    try {
+      const { generateResumePdfBlob } = await import('./generateResumePdf');
+      const blob = await generateResumePdfBlob(data, style);
+
+      const formData = new FormData();
+      formData.append('file', blob, `${finalName.replace(/\s+/g, '_')}.pdf`);
+      formData.append('name', finalName);
+
+      const response = await fetch('/api/assets/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || errData.message || 'Upload failed');
+      }
+
+      setAssetSaveStatus('saved');
+      setTimeout(() => {
+        setAssetModalOpen(false);
+        setAssetSaveStatus('idle');
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setAssetSaveStatus('error');
+      setTimeout(() => setAssetSaveStatus('idle'), 4000);
+    }
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -483,7 +494,6 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
           <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
             Resume Editor
           </h1>
-          <p className="text-zinc-500 text-sm mt-0.5">Edit content · tweak style · preview live.</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <button type="button" onClick={() => setShowPreview(p => !p)}
@@ -565,6 +575,57 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
                       <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Admin Only</p>
                       <p className="text-[10px] text-zinc-400 leading-relaxed">
                         Saving to the site requires admin access. You can still download the PDF locally.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Arrow */}
+                  <div className="absolute -top-1.5 right-5 w-3 h-3 bg-zinc-900 border-l border-t border-amber-500/30 rotate-45" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Save to Assets — admin only */}
+          <div className="relative group/save-assets">
+            <button
+              type="button"
+              onClick={() => {
+                if (isAdmin) {
+                  setAssetFileName(`${data.name.trim() || 'My'}_Resume_${new Date().getFullYear()}`);
+                  setAssetModalOpen(true);
+                }
+              }}
+              disabled={!isAdmin || assetSaveStatus === 'saving'}
+              className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${!isAdmin
+                ? 'bg-zinc-800 border border-zinc-700 text-zinc-500 cursor-not-allowed'
+                : assetSaveStatus === 'saved' ? 'bg-emerald-600 text-white'
+                  : assetSaveStatus === 'error' ? 'bg-red-600 text-white'
+                    : 'border border-zinc-700 hover:bg-zinc-800 text-zinc-300'
+                }`}
+            >
+              {!isAdmin ? (
+                <><ShieldAlert size={14} className="text-amber-500" /> Save to Assets</>
+              ) : assetSaveStatus === 'saving' ? (
+                <><Loader2 size={14} className="animate-spin" /> Saving…</>
+              ) : assetSaveStatus === 'saved' ? (
+                <><CheckCircle2 size={14} /> Saved!</>
+              ) : assetSaveStatus === 'error' ? (
+                'Error — retry'
+              ) : (
+                <><FileUp size={14} /> Save to Assets</>
+              )}
+            </button>
+
+            {/* Tooltip shown only for non-admins */}
+            {!isAdmin && (
+              <div className="absolute right-0 top-full mt-2 w-56 pointer-events-none opacity-0 group-hover/save-assets:opacity-100 transition-opacity duration-200 z-50">
+                <div className="bg-zinc-900 border border-amber-500/30 rounded-xl p-3 shadow-xl">
+                  <div className="flex items-start gap-2">
+                    <ShieldAlert size={14} className="text-amber-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Admin Only</p>
+                      <p className="text-[10px] text-zinc-400 leading-relaxed">
+                        Saving to assets requires admin access.
                       </p>
                     </div>
                   </div>
@@ -882,6 +943,49 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
           </div>
         )}
       </div>
+
+      {assetModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/75 p-4 backdrop-blur-sm transition-all duration-300">
+          <div className="w-full max-w-md scale-100 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 shadow-2xl shadow-black/80 transition-all">
+            <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <FileUp size={18} className="text-blue-500" /> Save Resume to Assets
+            </h3>
+            <p className="mt-2 text-xs text-zinc-400">
+              Please enter a filename to save this version of your resume in the site assets:
+            </p>
+            <div className="mt-4">
+              <input
+                type="text"
+                value={assetFileName}
+                onChange={(e) => setAssetFileName(e.target.value)}
+                placeholder="e.g. Resume_Developer_Role"
+                className="w-full bg-zinc-950/50 border border-zinc-800 hover:border-zinc-700 focus:border-blue-500/50 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-700 outline-none transition-all"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    executeSaveToAssets();
+                  }
+                }}
+              />
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setAssetModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeSaveToAssets}
+                disabled={assetSaveStatus === 'saving'}
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-500 shadow-xl shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50"
+              >
+                {assetSaveStatus === 'saving' ? 'Saving...' : 'Save to Assets'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
