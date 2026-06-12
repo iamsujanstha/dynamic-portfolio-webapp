@@ -48,6 +48,9 @@ export interface ResumeStyleConfig {
 
   // Bullet style
   bulletChar: 'filled-circle' | 'hollow-circle' | 'dash' | 'arrow' | 'square';
+
+  // Toggle for Tech Stack
+  showTechStack: boolean;
 }
 
 export const DEFAULT_STYLE: ResumeStyleConfig = {
@@ -79,6 +82,7 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
   linkColor: '#1155CC',
 
   bulletChar: 'filled-circle',
+  showTechStack: true,
 };
 
 // Maps font key → @react-pdf bold variant
