@@ -331,7 +331,7 @@ export function ResumePDFDocument({
                 </View>
                 <Text style={s.role}>{exp.role}</Text>
                 {exp.bullets.map((b, bi) => <Bullet key={bi} text={b} />)}
-                {styleConfig.showTechStack && exp.techStack && (
+                {styleConfig.showTechStack !== false && exp.techStack && (
                   <Text style={s.techRow}>
                     <Text style={s.techBold}>[Tech Stack used: </Text>
                     <Text style={s.techPlain}>{exp.techStack}]</Text>

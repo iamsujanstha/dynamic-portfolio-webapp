@@ -170,6 +170,8 @@ function StylePanel({
   const set = <K extends keyof ResumeStyleConfig>(key: K) =>
     (value: ResumeStyleConfig[K]) => onChange(key, value);
 
+  const showTechStack = style.showTechStack !== false;
+
   return (
     <div className="space-y-5 px-4">
       {/* Actions row */}
@@ -243,12 +245,12 @@ function StylePanel({
           <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Show Tech Stack</span>
           <button
             type="button"
-            onClick={() => onChange('showTechStack', !style.showTechStack)}
+            onClick={() => onChange('showTechStack', !showTechStack)}
             className="focus:outline-none"
             aria-label="Toggle show tech stack"
           >
-            <div className={`w-9 h-5 rounded-full transition-colors relative ${style.showTechStack ? 'bg-blue-600' : 'bg-zinc-800'}`}>
-              <div className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full bg-zinc-400 transition-transform ${style.showTechStack ? 'translate-x-4 bg-white' : 'translate-x-0'}`} />
+            <div className={`w-9 h-5 rounded-full transition-colors relative ${showTechStack ? 'bg-blue-600' : 'bg-zinc-800'}`}>
+              <div className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full bg-zinc-400 transition-transform ${showTechStack ? 'translate-x-4 bg-white' : 'translate-x-0'}`} />
             </div>
           </button>
         </div>
