@@ -477,7 +477,6 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* ── Top bar ── */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
