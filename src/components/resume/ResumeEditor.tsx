@@ -239,6 +239,19 @@ function StylePanel({
             <option value="square">▪ Square</option>
           </select>
         </Field>
+        <div className="flex items-center justify-between py-2 border-t border-zinc-800/40">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Show Tech Stack</span>
+          <button
+            type="button"
+            onClick={() => onChange('showTechStack', !style.showTechStack)}
+            className="focus:outline-none"
+            aria-label="Toggle show tech stack"
+          >
+            <div className={`w-9 h-5 rounded-full transition-colors relative ${style.showTechStack ? 'bg-blue-600' : 'bg-zinc-800'}`}>
+              <div className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full bg-zinc-400 transition-transform ${style.showTechStack ? 'translate-x-4 bg-white' : 'translate-x-0'}`} />
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* ── Name Header Settings ────────────────────────────────────────────── */}
