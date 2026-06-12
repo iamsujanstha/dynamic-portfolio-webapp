@@ -170,8 +170,6 @@ function StylePanel({
   const set = <K extends keyof ResumeStyleConfig>(key: K) =>
     (value: ResumeStyleConfig[K]) => onChange(key, value);
 
-  const showTechStack = style.showTechStack !== false;
-
   return (
     <div className="space-y-5 px-4">
       {/* Actions row */}
@@ -241,19 +239,6 @@ function StylePanel({
             <option value="square">▪ Square</option>
           </select>
         </Field>
-        <div className="flex items-center justify-between py-2 border-t border-zinc-800/40">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Show Tech Stack</span>
-          <button
-            type="button"
-            onClick={() => onChange('showTechStack', !showTechStack)}
-            className="focus:outline-none"
-            aria-label="Toggle show tech stack"
-          >
-            <div className={`w-9 h-5 rounded-full transition-colors relative ${showTechStack ? 'bg-blue-600' : 'bg-zinc-800'}`}>
-              <div className={`absolute top-[2px] left-[2px] w-4 h-4 rounded-full bg-zinc-400 transition-transform ${showTechStack ? 'translate-x-4 bg-white' : 'translate-x-0'}`} />
-            </div>
-          </button>
-        </div>
       </div>
 
       {/* ── Name Header Settings ────────────────────────────────────────────── */}
@@ -338,6 +323,7 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
     if (initialStyle) return { ...DEFAULT_STYLE, ...initialStyle };
     return DEFAULT_STYLE;
   });
+  const showTechStack = style.showTechStack !== false;
   const [activeTab, setActiveTab] = useState<'content' | 'style'>('content');
   const [showPreview, setShowPreview] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -696,29 +682,59 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
                       </button>
                     </div>
                     <div>
-                      <label className={labelCls}>Tech Stack</label>
-                      <div className="w-full flex flex-wrap gap-1.5 p-2 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600/40 transition-all min-h-[38px]">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={labelCls}>Tech Stack</label>
+                        <button
+                          type="button"
+                          onClick={() => setStyle$('showTechStack', !showTechStack)}
+                          className="focus:outline-none flex items-center gap-1.5"
+                          aria-label="Toggle show tech stack"
+                        >
+                          <span className="text-[8px] font-bold uppercase tracking-widest text-zinc-500">Show in PDF</span>
+                          <div className={`w-7 h-4 rounded-full transition-colors relative ${showTechStack ? 'bg-blue-600' : 'bg-zinc-800'}`}>
+                            <div className={`absolute top-[2px] left-[2px] w-3 h-3 rounded-full bg-zinc-400 transition-transform ${showTechStack ? 'translate-x-3 bg-white' : 'translate-x-0'}`} />
+                          </div>
+                        </button>
+                      </div>
+                      <div className={`w-full flex flex-wrap gap-1.5 p-2 border rounded-lg transition-all min-h-[38px] ${!showTechStack
+                        ? 'bg-zinc-900/40 border-zinc-800/60 opacity-60 cursor-not-allowed'
+                        : 'bg-zinc-950 border border-zinc-800 text-zinc-200 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600/40'
+                        }`}>
                         {(exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : []).map((tag, tagIdx) => (
-                          <span key={tagIdx} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-500/5 hover:bg-blue-500/20 transition-all">
+                          <span key={tagIdx} className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-sm transition-all ${!showTechStack
+                            ? 'bg-zinc-800/40 text-zinc-500 border-zinc-800'
+                            : 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm shadow-blue-500/5 hover:bg-blue-500/20'
+                            }`}>
                             {tag}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const tags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
-                                const newTags = tags.filter((_, i) => i !== tagIdx);
-                                updateExp(exp.id, 'techStack', newTags.join(', '));
-                              }}
-                              className="text-zinc-500 hover:text-red-400 font-extrabold cursor-pointer transition-colors"
-                            >
-                              &times;
-                            </button>
+                            {showTechStack && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const tags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
+                                  const newTags = tags.filter((_, i) => i !== tagIdx);
+                                  updateExp(exp.id, 'techStack', newTags.join(', '));
+                                }}
+                                className="text-zinc-500 hover:text-red-400 font-extrabold cursor-pointer transition-colors"
+                              >
+                                &times;
+                              </button>
+                            )}
                           </span>
                         ))}
                         <input
                           type="text"
-                          className="flex-1 min-w-[100px] bg-transparent border-0 p-0 text-xs text-zinc-200 placeholder:text-zinc-700 focus:outline-none focus:ring-0"
-                          placeholder={(exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : []).length === 0 ? "React, TypeScript, Next.js..." : "Add tech..."}
+                          disabled={!showTechStack}
+                          className={`flex-1 min-w-[100px] bg-transparent border-0 p-0 text-xs focus:outline-none focus:ring-0 ${!showTechStack ? 'text-zinc-600 cursor-not-allowed placeholder:text-zinc-600/50' : 'text-zinc-200 placeholder:text-zinc-700'
+                            }`}
+                          placeholder={
+                            !showTechStack
+                              ? "Tech stack is disabled"
+                              : (exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : []).length === 0
+                                ? "React, TypeScript, Next.js..."
+                                : "Add tech..."
+                          }
                           onKeyDown={e => {
+                            if (!showTechStack) return;
                             if (e.key === ',' || e.key === 'Enter') {
                               e.preventDefault();
                               const val = e.currentTarget.value.trim();
@@ -738,6 +754,7 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
                             }
                           }}
                           onBlur={e => {
+                            if (!showTechStack) return;
                             const val = e.currentTarget.value.trim();
                             if (val) {
                               const currentTags = exp.techStack ? exp.techStack.split(',').map(t => t.trim()).filter(Boolean) : [];
