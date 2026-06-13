@@ -11,11 +11,11 @@ export default function UnauthorizedPage() {
         </div>
         <h1 className="text-4xl font-black mb-4 tracking-tight">Access Denied</h1>
         <p className="text-zinc-400 mb-10 leading-relaxed">
-          Your account does not have the required permissions to access the Staff Console. 
+          Your account does not have the required permissions to access the Admin Console.
           Please contact the system administrator if you believe this is an error.
         </p>
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="inline-block px-8 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all"
         >
           Return to Neutral Zone

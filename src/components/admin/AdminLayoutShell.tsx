@@ -52,7 +52,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
             {isVerified ? <ShieldCheck size={18} className="text-white" /> : <Lock size={18} className="text-white" />}
           </div>
           <span className="font-bold text-sm tracking-tight">
-            {isVerified ? 'Staff Console' : 'LOCKED — Unauthorized'}
+            {isVerified ? 'Admin Console' : 'LOCKED — Unauthorized'}
           </span>
         </div>
         <button
