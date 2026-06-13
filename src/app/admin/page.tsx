@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { PageService } from '@/services/pageService';
 import { ProjectService } from '@/services/projectService';
 import { AssetService } from '@/services/assetService';
-import { Settings, FileText, Layout, Folder, Plus, User, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Settings, FileText, Folder, Plus, User, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { SeedButton } from '@/src/components/admin/SeedButton';
 import { validateSystemIdentity } from '@/lib/security';
 
@@ -19,8 +18,7 @@ export default async function AdminDashboard() {
   const isIdentityVerified = validateSystemIdentity();
   const isViewer = (session?.user as any)?.role === 'VIEWER';
 
-  const [pages, projects, assets] = await Promise.all([
-    PageService.getAllPages(),
+  const [projects, assets] = await Promise.all([
     ProjectService.getAllProjects(),
     AssetService.getAllAssets()
   ]);
@@ -53,24 +51,12 @@ export default async function AdminDashboard() {
             </div>
           </div>
         )}
-
-        <div className="hidden lg:block text-right">
-          <p className="text-zinc-600 text-xs font-mono uppercase">System Node: Asia-South1</p>
-          <p className="text-emerald-500 text-xs font-mono">STATUS: OPERATIONAL</p>
-        </div>
       </header>
 
       {isIdentityVerified ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Stats / Quick Links */}
-            <AdminCard
-              title="Pages"
-              count={pages.length}
-              icon={<Layout className="text-blue-500" />}
-              href="/admin/pages"
-              isViewer={isViewer}
-            />
             <AdminCard
               title="Projects"
               count={projects.length}
@@ -123,7 +109,7 @@ export default async function AdminDashboard() {
           </div>
           <h2 className="text-2xl font-black text-red-500 mb-3">Console Access Denied</h2>
           <p className="text-zinc-500 max-w-md text-sm leading-relaxed">
-            All console functions are locked. This instance does not have a valid System Identity Key configured. 
+            All console functions are locked. This instance does not have a valid System Identity Key configured.
             If you are the owner, set <code className="text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded text-xs">SYSTEM_IDENTITY_KEY</code> in your <code className="text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded text-xs">.env</code> file.
           </p>
         </div>

@@ -55,7 +55,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
             {isVerified ? 'Staff Console' : 'LOCKED — Unauthorized'}
           </span>
         </div>
-        <button 
+        <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
         >
@@ -65,7 +65,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
 
       {/* Backdrop for Mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -81,7 +81,7 @@ export function AdminLayoutShell({ children, isVerified = true }: { children: Re
             {isVerified ? <ShieldCheck size={20} className="text-white" /> : <Lock size={20} className="text-white" />}
           </div>
           <span className="font-bold text-lg tracking-tight">
-            {isVerified ? 'Staff Console' : 'LOCKED'}
+            {isVerified ? 'Admin Console' : 'LOCKED'}
           </span>
         </div>
 
