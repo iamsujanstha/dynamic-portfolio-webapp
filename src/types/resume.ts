@@ -20,6 +20,7 @@ export interface ResumeExperience {
   role: string;
   bullets: string[];
   techStack: string;
+  order?: number;
 }
 
 export interface ResumeEducation {

@@ -375,7 +375,7 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
 
   // ── Experience ────────────────────────────────────────────────────────────
   function addExp() {
-    setData(d => ({ ...d, experience: [...d.experience, { id: nanoid(), company: '', startDate: '', endDate: 'Present', role: '', bullets: [''], techStack: '' } as ResumeExperience] }));
+    setData(d => ({ ...d, experience: [{ id: nanoid(), company: '', startDate: '', endDate: 'Present', role: '', bullets: [''], techStack: '' } as ResumeExperience, ...d.experience] }));
   }
   function updateExp(id: string, key: keyof ResumeExperience, value: string | string[]) {
     setData(d => ({ ...d, experience: d.experience.map(e => e.id === id ? { ...e, [key]: value } : e) }));
@@ -392,6 +392,15 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
   function removeExp(id: string) {
     setData(d => ({ ...d, experience: d.experience.filter(e => e.id !== id) }));
   }
+  function reorderExp(fromIdx: number, toIdx: number) {
+    if (toIdx < 0 || toIdx >= data.experience.length || fromIdx === toIdx) return;
+    setData(d => {
+      const exp = [...d.experience];
+      const [moved] = exp.splice(fromIdx, 1);
+      exp.splice(toIdx, 0, moved);
+      return { ...d, experience: exp };
+    });
+  }
 
   // ── Education ─────────────────────────────────────────────────────────────
   function addEdu() {
@@ -402,6 +411,15 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
   }
   function removeEdu(id: string) {
     setData(d => ({ ...d, education: d.education.filter(e => e.id !== id) }));
+  }
+  function reorderEdu(fromIdx: number, toIdx: number) {
+    if (toIdx < 0 || toIdx >= data.education.length || fromIdx === toIdx) return;
+    setData(d => {
+      const edu = [...d.education];
+      const [moved] = edu.splice(fromIdx, 1);
+      edu.splice(toIdx, 0, moved);
+      return { ...d, education: edu };
+    });
   }
 
   // ── Skills ────────────────────────────────────────────────────────────────
@@ -698,10 +716,52 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
               </SectionAccordion>
 
               <SectionAccordion title="Experience" icon={Briefcase} defaultOpen>
+                <button type="button" onClick={addExp} className="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/5 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                  <Plus size={13} /> Add Experience
+                </button>
                 {data.experience.map((exp, idx) => (
                   <div key={exp.id} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Entry {idx + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Entry {idx + 1}</span>
+                        <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-0.5">
+                          <label htmlFor={`order-exp-${exp.id}`} className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Order:</label>
+                          <input
+                            id={`order-exp-${exp.id}`}
+                            type="number"
+                            min={1}
+                            max={data.experience.length}
+                            value={idx + 1}
+                            onChange={e => {
+                              const val = parseInt(e.target.value, 10);
+                              if (!isNaN(val) && val >= 1 && val <= data.experience.length) {
+                                reorderExp(idx, val - 1);
+                              }
+                            }}
+                            className="w-10 bg-transparent text-xs font-bold text-blue-400 focus:outline-none text-center"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => reorderExp(idx, idx - 1)}
+                            className="p-1 text-zinc-500 hover:text-zinc-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors rounded hover:bg-zinc-800"
+                            title="Move Up"
+                          >
+                            <ChevronUp size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === data.experience.length - 1}
+                            onClick={() => reorderExp(idx, idx + 1)}
+                            className="p-1 text-zinc-500 hover:text-zinc-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors rounded hover:bg-zinc-800"
+                            title="Move Down"
+                          >
+                            <ChevronDown size={13} />
+                          </button>
+                        </div>
+                      </div>
                       <button type="button" onClick={() => removeExp(exp.id)} className="p-1 text-zinc-600 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10"><Trash2 size={13} /></button>
                     </div>
                     <Field label="Company"><input className={inputCls} value={exp.company} onChange={e => updateExp(exp.id, 'company', e.target.value)} /></Field>
@@ -830,16 +890,52 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
                     </div>
                   </div>
                 ))}
-                <button type="button" onClick={addExp} className="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-zinc-500 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/5 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                  <Plus size={13} /> Add Experience
-                </button>
               </SectionAccordion>
 
               <SectionAccordion title="Education" icon={GraduationCap}>
                 {data.education.map((edu, idx) => (
                   <div key={edu.id} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Entry {idx + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Entry {idx + 1}</span>
+                        <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-md px-2 py-0.5">
+                          <label htmlFor={`order-edu-${edu.id}`} className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Order:</label>
+                          <input
+                            id={`order-edu-${edu.id}`}
+                            type="number"
+                            min={1}
+                            max={data.education.length}
+                            value={idx + 1}
+                            onChange={e => {
+                              const val = parseInt(e.target.value, 10);
+                              if (!isNaN(val) && val >= 1 && val <= data.education.length) {
+                                reorderEdu(idx, val - 1);
+                              }
+                            }}
+                            className="w-10 bg-transparent text-xs font-bold text-blue-400 focus:outline-none text-center"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => reorderEdu(idx, idx - 1)}
+                            className="p-1 text-zinc-500 hover:text-zinc-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors rounded hover:bg-zinc-800"
+                            title="Move Up"
+                          >
+                            <ChevronUp size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === data.education.length - 1}
+                            onClick={() => reorderEdu(idx, idx + 1)}
+                            className="p-1 text-zinc-500 hover:text-zinc-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors rounded hover:bg-zinc-800"
+                            title="Move Down"
+                          >
+                            <ChevronDown size={13} />
+                          </button>
+                        </div>
+                      </div>
                       <button type="button" onClick={() => removeEdu(edu.id)} className="p-1 text-zinc-600 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10"><Trash2 size={13} /></button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
