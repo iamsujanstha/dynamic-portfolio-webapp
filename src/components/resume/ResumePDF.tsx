@@ -261,6 +261,17 @@ export function ResumePDFDocument({
     );
   }
 
+  const hasSummary = Boolean(summary?.trim());
+  const validExperience = experience.filter(
+    exp => exp.company?.trim() || exp.role?.trim() || exp.bullets?.some(b => b?.trim()) || exp.techStack?.trim()
+  );
+  const validEducation = education.filter(
+    edu => edu.institution?.trim() || edu.degree?.trim()
+  );
+  const validSkillGroups = skillGroups.filter(
+    sg => sg.category?.trim() || sg.skills?.trim()
+  );
+
   return (
     <Document title={name} author={name} subject="Resume">
       <Page size={styleConfig.pageSize || 'LETTER'} style={s.page}>
@@ -277,53 +288,57 @@ export function ResumePDFDocument({
         )}
 
         {/* ── CONTACT ROW ── */}
-        <View style={s.contactRow}>
-          {contactItems.map((item, i) => {
-            const isLink = !!item.url;
-            return (
-              <View
-                key={i}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginLeft: i > 0 ? styleConfig.contactItemGap : 0,
-                }}
-              >
-                {i > 0 && (
-                  <Text
-                    style={[
-                      s.cSep,
-                      { marginRight: styleConfig.contactBulletGap },
-                    ]}
-                  >
-                    {'\u2022'}
-                  </Text>
-                )}
-                <Text style={s.cText}>
-                  {item.url ? (
-                    <Link src={item.url} style={s.cLink}>
-                      {item.label}
-                    </Link>
-                  ) : (
-                    item.label
+        {contactItems.length > 0 && (
+          <View style={s.contactRow}>
+            {contactItems.map((item, i) => {
+              const isLink = !!item.url;
+              return (
+                <View
+                  key={i}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: i > 0 ? styleConfig.contactItemGap : 0,
+                  }}
+                >
+                  {i > 0 && (
+                    <Text
+                      style={[
+                        s.cSep,
+                        { marginRight: styleConfig.contactBulletGap },
+                      ]}
+                    >
+                      {'\u2022'}
+                    </Text>
                   )}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-
-        {/* ── RULE BELOW CONTACT ── */}
-        <View style={s.rule} />
+                  <Text style={s.cText}>
+                    {item.url ? (
+                      <Link src={item.url} style={s.cLink}>
+                        {item.label}
+                      </Link>
+                    ) : (
+                      item.label
+                    )}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        )}
 
         {/* ── SUMMARY ── */}
-        {summary ? <Text style={s.summary}>{summary}</Text> : null}
+        {hasSummary && (
+          <>
+            <View style={s.rule} />
+            <Text style={s.summary}>{summary}</Text>
+          </>
+        )}
 
         {/* ── PROFESSIONAL EXPERIENCE ── */}
-        {experience.length > 0 && (
+        {validExperience.length > 0 && (
           <>
             <SectionHeading title="PROFESSIONAL EXPERIENCE" />
-            {experience.map((exp, ei) => (
+            {validExperience.map((exp, ei) => (
               <View key={exp.id} style={ei > 0 ? s.entryGap : undefined}>
                 <View style={s.entryRow}>
                   <Text style={s.company}>{exp.company}</Text>
@@ -343,10 +358,10 @@ export function ResumePDFDocument({
         )}
 
         {/* ── EDUCATION ── */}
-        {education.length > 0 && (
+        {validEducation.length > 0 && (
           <>
             <SectionHeading title="EDUCATION" />
-            {education.map((edu) => (
+            {validEducation.map((edu) => (
               <View key={edu.id}>
                 <View style={s.entryRow}>
                   <Text style={s.company}>
@@ -361,10 +376,10 @@ export function ResumePDFDocument({
         )}
 
         {/* ── SKILLS & OTHERS ── */}
-        {skillGroups.length > 0 && (
+        {validSkillGroups.length > 0 && (
           <>
             <SectionHeading title="SKILLS & OTHERS" />
-            {skillGroups.map((sg) => (
+            {validSkillGroups.map((sg) => (
               <Text key={sg.id} style={s.skillRow}>
                 <Text style={s.skillBold}>{sg.category}: </Text>
                 <Text style={s.bulletText}>{sg.skills}</Text>
