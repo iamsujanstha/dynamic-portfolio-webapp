@@ -771,7 +771,10 @@ export function ResumeEditor({ initialData, initialStyle }: { initialData?: Part
                       <Field label="End"><input className={inputCls} value={exp.endDate} onChange={e => updateExp(exp.id, 'endDate', e.target.value)} placeholder="Present" /></Field>
                     </div>
                     <div>
-                      <label className={labelCls}>Bullet Points</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={labelCls}>Bullet Points</label>
+                        <span className="text-[10px] text-zinc-500 font-normal">use **word** to bold terms</span>
+                      </div>
                       <div className="space-y-2">
                         {exp.bullets.map((b, bi) => (
                           <div

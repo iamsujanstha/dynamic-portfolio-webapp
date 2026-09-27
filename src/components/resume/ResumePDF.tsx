@@ -96,6 +96,7 @@ function makeStyles(c: ResumeStyleConfig) {
     },
     nameRule: {
       flex: 1,
+      height: 0,
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
     },
@@ -134,6 +135,7 @@ function makeStyles(c: ResumeStyleConfig) {
 
     // ── Rule ────────────────────────────────────────────────────────────────
     rule: {
+      height: 0,
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
     },
@@ -151,6 +153,7 @@ function makeStyles(c: ResumeStyleConfig) {
     // ── Section heading ──────────────────────────────────────────────────────
     secWrap: { marginTop: c.sectionGap },
     secTopRule: {
+      height: 0,
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
       marginBottom: 1,
@@ -164,13 +167,14 @@ function makeStyles(c: ResumeStyleConfig) {
       marginBottom: 1,
     },
     secBotRule: {
+      height: 0,
       borderBottomWidth: c.ruleWidth,
       borderBottomColor: c.ruleColor,
-      marginBottom: 6
+      marginBottom: 6,
     },
 
     // ── Entry ────────────────────────────────────────────────────────────────
-    entryGap: { marginTop: c.entryGap },
+    entryGap: { marginTop: Math.max(c.entryGap, 11) },
     entryRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -197,7 +201,7 @@ function makeStyles(c: ResumeStyleConfig) {
     dot: {
       fontFamily: c.font,
       fontSize: c.baseFontSize,
-      lineHeight: c.lineHeight + 0.04,
+      lineHeight: c.lineHeight + 0.08,
       width: c.bulletTextSpace,
       flexShrink: 0,
       letterSpacing: c.bodyLetterSpacing,
@@ -205,14 +209,18 @@ function makeStyles(c: ResumeStyleConfig) {
     bulletText: {
       fontFamily: c.font,
       fontSize: c.baseFontSize,
-      lineHeight: c.lineHeight + 0.04,
+      lineHeight: c.lineHeight + 0.08,
       flex: 1,
       textAlign: 'left',
       letterSpacing: c.bodyLetterSpacing,
     },
+    bulletBold: {
+      fontFamily: FB,
+      color: '#000000',
+    },
 
     // ── Tech stack ───────────────────────────────────────────────────────────
-    techRow: { marginTop: 2, marginBottom: 1 },
+    techRow: { marginTop: 2, marginBottom: 2 },
     techBold: { fontFamily: FB, fontSize: c.baseFontSize, letterSpacing: c.bodyLetterSpacing },
     techPlain: { fontFamily: c.font, fontSize: c.baseFontSize, letterSpacing: c.bodyLetterSpacing },
 
@@ -255,12 +263,41 @@ export function ResumePDFDocument({
     ...(contact.linkedinLabel ? [{ label: contact.linkedinLabel, url: contact.linkedinUrl || '#' }] : []),
   ].filter(i => i.label?.trim());
 
+  function renderFormattedText(content: string, boldStyle: any) {
+    if (!content) return null;
+    const parts = content.split(/(\*\*.*?\*\*|<b>.*?<\/b>|<strong>.*?<\/strong>)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+        return (
+          <Text key={index} style={boldStyle}>
+            {part.slice(2, -2)}
+          </Text>
+        );
+      }
+      if (part.startsWith('<b>') && part.endsWith('</b>') && part.length >= 7) {
+        return (
+          <Text key={index} style={boldStyle}>
+            {part.slice(3, -4)}
+          </Text>
+        );
+      }
+      if (part.startsWith('<strong>') && part.endsWith('</strong>') && part.length >= 17) {
+        return (
+          <Text key={index} style={boldStyle}>
+            {part.slice(8, -9)}
+          </Text>
+        );
+      }
+      return part;
+    });
+  }
+
   function Bullet({ text }: { text: string }) {
     if (!text?.trim()) return null;
     return (
       <View style={s.bulletRow}>
         <Text style={s.dot}>{bulletChar}</Text>
-        <Text style={s.bulletText}>{text}</Text>
+        <Text style={s.bulletText}>{renderFormattedText(text, s.bulletBold)}</Text>
       </View>
     );
   }
@@ -343,7 +380,7 @@ export function ResumePDFDocument({
         {hasSummary && (
           <>
             <View style={s.rule} />
-            <Text style={s.summary}>{summary}</Text>
+            <Text style={s.summary}>{renderFormattedText(summary, s.bulletBold)}</Text>
           </>
         )}
 
@@ -374,8 +411,8 @@ export function ResumePDFDocument({
         {validEducation.length > 0 && (
           <>
             <SectionHeading title="EDUCATION" />
-            {validEducation.map((edu) => (
-              <View key={edu.id}>
+            {validEducation.map((edu, edui) => (
+              <View key={edu.id} style={edui > 0 ? s.entryGap : undefined}>
                 <View style={s.entryRow}>
                   <Text style={s.company}>
                     {edu.institution}{edu.location ? `, ${edu.location}` : ''}

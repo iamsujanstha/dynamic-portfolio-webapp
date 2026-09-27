@@ -68,11 +68,11 @@ export const DEFAULT_STYLE: ResumeStyleConfig = {
 
   bulletGap: 2,
   sectionGap: 5.5,
-  entryGap: 7,
+  entryGap: 11,
   contactItemGap: 8,
   contactBulletGap: 3,
 
-  ruleWidth: 1.5,
+  ruleWidth: 1.0,
   ruleColor: '#000000',
 
   nameFontSize: 18,
