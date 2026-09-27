@@ -143,7 +143,7 @@ function makeStyles(c: ResumeStyleConfig) {
       fontFamily: c.font, // regular weight (not FI)
       fontSize: c.baseFontSize + 0.5,
       lineHeight: c.lineHeight + 0.07,
-      textAlign: 'justify',
+      textAlign: 'left',
       marginTop: 5,
       letterSpacing: c.bodyLetterSpacing,
     },
@@ -176,9 +176,16 @@ function makeStyles(c: ResumeStyleConfig) {
       justifyContent: 'space-between',
       alignItems: 'flex-start',
     },
-    company: { fontFamily: c.font, fontSize: c.baseFontSize + 1, flex: 1, letterSpacing: c.bodyLetterSpacing },
-    dates: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, flexShrink: 0, marginLeft: 8, letterSpacing: c.bodyLetterSpacing },
-    role: { fontFamily: FB, fontSize: c.baseFontSize + 1, marginTop: 1, marginBottom: 6, letterSpacing: c.bodyLetterSpacing },
+    company: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, flex: 1, letterSpacing: c.bodyLetterSpacing },
+    dates: { fontFamily: c.font, fontSize: c.baseFontSize, flexShrink: 0, marginLeft: 8, letterSpacing: c.bodyLetterSpacing },
+    role: {
+      fontFamily: c.font,
+      fontSize: c.baseFontSize,
+      color: '#374151',
+      marginTop: 1,
+      marginBottom: 5,
+      letterSpacing: c.bodyLetterSpacing,
+    },
 
     // ── Bullet ───────────────────────────────────────────────────────────────
     bulletRow: {
@@ -200,7 +207,7 @@ function makeStyles(c: ResumeStyleConfig) {
       fontSize: c.baseFontSize,
       lineHeight: c.lineHeight + 0.04,
       flex: 1,
-      textAlign: 'justify',
+      textAlign: 'left',
       letterSpacing: c.bodyLetterSpacing,
     },
 
@@ -210,7 +217,13 @@ function makeStyles(c: ResumeStyleConfig) {
     techPlain: { fontFamily: c.font, fontSize: c.baseFontSize, letterSpacing: c.bodyLetterSpacing },
 
     // ── Education ────────────────────────────────────────────────────────────
-    eduDegree: { fontFamily: FB, fontSize: c.baseFontSize + 0.5, marginTop: 1, letterSpacing: c.bodyLetterSpacing },
+    eduDegree: {
+      fontFamily: c.font,
+      fontSize: c.baseFontSize,
+      color: '#374151',
+      marginTop: 1,
+      letterSpacing: c.bodyLetterSpacing,
+    },
 
     // ── Skills ───────────────────────────────────────────────────────────────
     skillRow: { marginBottom: 1.5 },
